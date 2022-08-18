@@ -1,0 +1,135 @@
+\documentclass[english,final]{his-thesis}
+
+%% Import functionality for front matter, i.e. titlepage and other sections
+\usepackage{mattersections}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Source code with 'minted'
+%%
+%% To show source code listings, make use of the 'minted' package.
+%% The following lines set some reasonable configuration options.
+%% If you do not make use of source code listings in your
+%% dissertation, it is safe to remove those lines.
+
+% \usepackage{minted}
+% \usepackage{MnSymbol}
+% \undef\mathdollar% Remove \mathdollar as defined by MnSymbol to avoid clashes of commands
+% \setminted{%
+% breaklines,% automatically break longer lines at spaces
+% breaksymbolright={\raisebox{-0.4ex}{\ensuremath{\rhookswarrow}}},% show a nice symbol when breaking
+% breaksymbolleft={},% no symbol in the continuing line
+% breakindent=1em,% indent broken lines' continuation
+% linenos=true,% have line numbers
+% tabsize=4,% define the width of tab characters
+% fontfamily=tt,% use mono-spaced font
+% }
+
+%% End of configuration for package 'minted'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Custom packages and commands
+\usepackage{csquotes, rotating, tikz, subcaption, tabularx, xltabular, ccicons}
+\usetikzlibrary{arrows,arrows.meta,shapes.arrows,positioning,fit,shapes.geometric,decorations.pathreplacing,calc}
+%\tikzexternalize[prefix=tikz/]
+
+\usepackage{unicode-math}
+\setmathfont[Scale=MatchUppercase]{STIX Two Math}
+
+%\usepackage[final,protrusion=false,expansion=false]{microtype}
+\usepackage[final]{microtype}
+\usepackage{siunitx}
+\sisetup{%
+    detect-all,
+    free-standing-units, 
+    space-before-unit, 
+    use-xspace,
+    group-separator = {,}
+}
+
+\usepackage[capitalize,noabbrev,nameinlink]{cleveref} % Make use of \cref commands
+\creflabelformat{equation}{#1#3#2}
+\graphicspath{{img/}{tex/}} % Defines the path to look for images and plots
+
+\usepackage[shortlabels]{enumitem} % Indentation of lists
+% Fix indentation for lists.
+\setlist[enumerate,1]{leftmargin=0.75cm}
+\renewcommand{\arraystretch}{1.5} % Increased vertical space in tables
+%% End Custom packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Abbreviations and references
+% Abbreviations, will automatically be added to the list of abbreviations if used in the text
+% \newacronym{key}{abbreviation}{full name}
+\usepackage[acronym,toc=true,nomain,xindy,style=super,nonumberlist,automake]{glossaries-extra}
+\setabbreviationstyle[acronym]{long-short}
+\makeglossaries
+\newacronym{moo}{MOO}{Multi-Objective Optimization}
+\newacronym{sbo}{SBO}{Simulation-Based Optimization}
+\newacronym{ai}{AI}{Artificial Intelligence}
+\newacronym{doe}{DOE}{Design of Experiments}
+
+% Bibliography to use, easiest to include all references, both your own and other sources
+%\addbibresource{references.bib}
+\addbibresource{example-bibliography.bib}
+
+%% End Abbreviations and references
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{lipsum} % Only for this example. Remove when starting to write your own.
+
+\begin{document}
+% The front matter contains the title page, abstract, abstract in Swedish (Sammanfattning), acknowledgments, your own publications, table of contents, list of figures, list of tables, and abbreviations. 
+% The inputs needed are the \thesisabstract, \thesissammanfattning, \thesisacknowledgements, and lastly the ownpublications environment.
+\begin{frontmatter}
+    \thesisabstract{ % Not more than 360 words (<1 page)
+    As society is rapidly changed by electrification, digitalization, and globalization, the automotive industry is particularly affected. Reacting to these changes requires predictive tools, the most common being Discrete-Event Simulation combined with Multi-Objective Optimization, referred to as Simulation-Based Optimization. Production lines are most often the focus for optimization while the factory level is ignored even though the factory level has a larger impact on the total production. One reason for not optimizing on the factory level is the time needed due to the complexity of the line models making up the factory model. This licentiate thesis aims to validate and evaluate a model simplification technique to enable optimization of factories leading to cost and resource effective manufacturing.}
+
+    % Only if dissertation or thesis!
+    \thesissammanfattning{\lipsum[1]}
+    
+    % Acknowledgements if you want to add those.
+    \thesisacknowledgements{\lipsum[1]}   
+    
+    % Can be formatted in different ways, see the manual.
+    \begin{ownpublications}
+    %\highrelevancepublications{fischer2017doctoraldissertationmanual,fischer2017doctoraldissertationmanual}
+        %\lowrelevancepublications{}
+        %\authorspublication[Authors contribution]{fischer2017doctoraldissertationmanual}
+        \authorspublication{fischer2017doctoraldissertationmanual}
+        \authorspublication[Design, manuscript preparation, review]{fischer2017doctoraldissertationmanual}
+    \end{ownpublications}
+\end{frontmatter}
+
+% After the front matter, the main matter of the text is placed, consisting of the contents of the work.
+% Recommended to use separate tex files for each chapter organized in subfolders, comment them as necessary to focus on a specific chapter. 
+% If not, just include parts, chapters, sections, and subsections as usual.
+%\part*{Introduction} % Only use parts with doctoral dissertation and licentiate thesis
+\input{chapters/1_Introduction}
+
+%\part*{Frame of Reference}
+\input{chapters/2_FrameOfReference}
+
+%\part*{Research Methodology}
+\input{chapters/3_Methods}
+
+%\part*{Summary of Included Papers}
+\input{chapters/4_Results}
+
+%\part*{Conclusions}
+\input{chapters/5_Conclusions}
+
+% Start of back matter, appendix, list of references, included full text articles, and list of previous dissertations
+% List of references and list of previous dissertations are automatically placed using the backmatter environment, only the fullarticles environment is needed.
+\begin{backmatter}
+    % Example of including full text articles in the manuscript.
+    % It's possible to specify what is written both before the reference and after.
+    % \fullarticle[includepdf options]{reference}{pdf-file}[before][after]
+    \begin{fullarticles}
+        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=-]{fischer2017doctoraldissertationmanual}{manual.pdf}[\href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{\ccbyncnd}]
+        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[\copyright{} 2018 University of Skövde. Reprinted, with permission, from]
+        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[Reprinted from][with permission from University of Skövde.]
+    \end{fullarticles}
+\end{backmatter}
+\end{document}
