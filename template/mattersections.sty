@@ -55,11 +55,12 @@
 
 % Front matter specification
 \renewenvironment{frontmatter}{
-    \ifthenelse{\boolean{@isfinal}}{%
+    \ifthenelse{\boolean{@usecover}}{%
         \renewcommand{\nopagecolor}{specialpagebackgroundcover}%
         \newpagecolor{specialpagebackgroundcover}%
 	\pagestyle{empty}
-        \internalcoverpage{}
+	\newpage
+        \internalcoverpage{\@coverimage}
         \newpage
         \restorepagecolor
     }{}
@@ -101,14 +102,15 @@
 }{
     \dissertationlist
     \fussy
-    \ifthenelse{\boolean{@isfinal}}{%
+    \ifthenelse{\boolean{@usecover}}{%
+	\isdissertation{\cleardoublepage}{\clearpage}
         \renewcommand{\nopagecolor}{specialpagebackgroundcover}%
         \newpagecolor{specialpagebackgroundcover}%
 	\pagestyle{empty}
 	\eject \pdfpagewidth 198mm \pdfpageheight 250mm% Set paper size to 198mm x 250mm
 	\newpage
         \internalbookspine
-        \internallastpage{template/Manuscript/foto.jpg}%
+        \internallastpage{\@coverphoto}%
         \restorepagecolor
     }{}
 }
