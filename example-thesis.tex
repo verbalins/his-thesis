@@ -1,4 +1,4 @@
-\documentclass[english,final,cover]{his-thesis}
+\documentclass[english]{his-thesis}
 
 %% Import functionality for front matter, i.e. titlepage and other sections
 \usepackage{mattersections}
@@ -29,23 +29,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Custom packages and commands
-\usepackage{csquotes, rotating, tikz, subcaption, tabularx, xltabular, ccicons}
-\usetikzlibrary{arrows,arrows.meta,shapes.arrows,positioning,fit,shapes.geometric,decorations.pathreplacing,calc}
-%\tikzexternalize[prefix=tikz/]
-
-\usepackage{unicode-math}
-\setmathfont[Scale=MatchUppercase]{STIX Two Math}
-
-%\usepackage[final,protrusion=false,expansion=false]{microtype}
-\usepackage[final]{microtype}
-\usepackage{siunitx}
-\sisetup{%
-    detect-all,
-    free-standing-units, 
-    space-before-unit, 
-    use-xspace,
-    group-separator = {,}
-}
+\usepackage{subcaption, tabularx, xltabular, ccicons, csquotes}
+%\usetikzlibrary{arrows,arrows.meta,shapes.arrows,positioning,fit,shapes.geometric,decorations.pathreplacing,calc}
 
 \usepackage[capitalize,noabbrev,nameinlink]{cleveref} % Make use of \cref commands
 \creflabelformat{equation}{#1#3#2}
@@ -90,7 +75,7 @@
     \thesissammanfattning{\lipsum[1]}
     
     % Acknowledgements if you want to add those.
-    \thesisacknowledgements{\lipsum[1]}   
+    \thesisacknowledgements{\lipsum[1]}
     
     % Can be formatted in different ways, see the manual.
     \begin{ownpublications}
@@ -105,19 +90,19 @@
 % After the front matter, the main matter of the text is placed, consisting of the contents of the work.
 % Recommended to use separate tex files for each chapter organized in subfolders, comment them as necessary to focus on a specific chapter. 
 % If not, just include parts, chapters, sections, and subsections as usual.
-%\part*{Introduction} % Only use parts with doctoral dissertation and licentiate thesis
+\part*{Introduction} % Only use parts with doctoral dissertation and licentiate thesis
 \input{chapters/1_Introduction}
 
-%\part*{Frame of Reference}
+\part*{Frame of Reference}
 \input{chapters/2_FrameOfReference}
 
-%\part*{Research Methodology}
+\part*{Research Methodology}
 \input{chapters/3_Methods}
 
-%\part*{Summary of Included Papers}
+\part*{Summary of Included Papers}
 \input{chapters/4_Results}
 
-%\part*{Conclusions}
+\part*{Conclusions}
 \input{chapters/5_Conclusions}
 
 % Start of back matter, appendix, list of references, included full text articles, and list of previous dissertations
