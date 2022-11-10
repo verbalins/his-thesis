@@ -7,7 +7,8 @@ This repo contains LaTeX templates for the PhD education at the University of Sk
 - Research Proposal
 
 ## Requirements
-- [TexLive](https://tug.org/texlive/)
+[TexLive](https://tug.org/texlive/)
+Updated to work in TexLive 2022.
 
 ## Installation
 Upload the package to Overleaf or use the Makefile to build locally.
