@@ -24,12 +24,43 @@ If successful, you should see an example-thesis.pdf containing the example repor
 3. Choose the structure of your manuscript, either everything in the same tex file or structured in chapters.
 4. Choose how you want to structure your previous publications. Either as individual publications or ranked by high and low relevance.
 
-## Useful commands
+## Specific commands for the template
+### metadata.tex
+```latex
+\publicationtype{type}
+```
+Sets the type of publication, allowed values are: `dissertation`, `licentiate`, `thesisproposal`, and `researchproposal`.
+
+```latex
+%% Define partner company name and logo.
+%% To be used if you are performing the work in collaboration with a company.
+\partnercompany{Company AB}
+\partnercompanylogo{img/companylogo.png}
+```
+If you are writing your thesis together with another company, supply the name and logo here.
+
+```latex
+%% The path to an image on the front cover, and an image of you on the back cover.
+\coverimage{template/Manuscript/foto.jpg}
+\coverphoto{template/Manuscript/face.jpg}
+```
+Sets the front cover image, if wanted, and the back cover photo which is required.
+
+## Difference between thesis and proposal
+The publicationtype of `dissertation` and `licentiate` are special, as they are requirements towards a degree. These will be typeset as a book, with special page size, contents, and colors. These follow the guidelines at the university [page](https://www.his.se/forskning/doktorandhandbok/disputation/avhandlingsmallar/) (in Swedish).
+
+The two other deliveries, `thesisproposal` and `researchproposal`, are formatted as a report as they are not going to be printed. This means A4 sizing, report format, no empty pages between chapters, and larger fonts to correspond to the larger paper size.
+
+## Useful commands for creating the pdf
 If you are comfortable with the Makefile approach, adapt the Makefile and use those commands.
 
 - Using regular latexmk. Compile to pdf (using [latexmk](https://mg.readthedocs.io/latexmk.html)):
 ```bash
 latexmk -pdf example-thesis.tex
+```
+- Continuously checking for changes and recompiling, previewing the output.
+```bash
+latexmk -pvc example-thesis.tex
 ```
 - Clean (delete some of the auxiliary files):
 ```bash
