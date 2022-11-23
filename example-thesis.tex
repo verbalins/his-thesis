@@ -1,7 +1,4 @@
-\documentclass[english]{his-thesis}
-
-%% Import functionality for front matter, i.e. titlepage and other sections
-\usepackage{mattersections}
+\documentclass[english,dissertation,cover,final]{his-thesis}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Source code with 'minted'
@@ -30,24 +27,23 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Custom packages and commands
 \usepackage{subcaption, tabularx, xltabular, ccicons, csquotes}
-%\usetikzlibrary{arrows,arrows.meta,shapes.arrows,positioning,fit,shapes.geometric,decorations.pathreplacing,calc}
+\usetikzlibrary{arrows,arrows.meta,shapes.arrows,positioning,fit,shapes.geometric,decorations.pathreplacing,calc}
 
 \usepackage[capitalize,noabbrev,nameinlink]{cleveref} % Make use of \cref commands
 \creflabelformat{equation}{#1#3#2}
 \graphicspath{{img/}{tex/}} % Defines the path to look for images and plots
 
-\usepackage[shortlabels]{enumitem} % Indentation of lists
+%\RequirePackage[shortlabels]{enumitem} % Indentation of lists
 % Fix indentation for lists.
-\setlist[enumerate,1]{leftmargin=0.75cm}
-\renewcommand{\arraystretch}{1.5} % Increased vertical space in tables
-%% End Custom packages
+%\setlist[enumerate,1]{leftmargin=0.75cm}
+%\renewcommand{\arraystretch}{1.5} % Increased vertical space in tables
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Abbreviations and references
 % Abbreviations, will automatically be added to the list of abbreviations if used in the text
 % \newacronym{key}{abbreviation}{full name}
-\usepackage[acronym,toc=true,nomain,xindy,style=super,nonumberlist,automake]{glossaries-extra}
+\usepackage[acronym,toc=true,nomain,xindy,style=super,nonumberlist]{glossaries-extra}
 \setabbreviationstyle[acronym]{long-short}
 \makeglossaries
 \newacronym{moo}{MOO}{Multi-Objective Optimization}
@@ -69,7 +65,11 @@
 % The inputs needed are the \thesisabstract, \thesissammanfattning, \thesisacknowledgements, and lastly the ownpublications environment.
 \begin{frontmatter}
     \thesisabstract{ % Not more than 360 words (<1 page)
-    As society is rapidly changed by electrification, digitalization, and globalization, the automotive industry is particularly affected. Reacting to these changes requires predictive tools, the most common being Discrete-Event Simulation combined with Multi-Objective Optimization, referred to as Simulation-Based Optimization. Production lines are most often the focus for optimization while the factory level is ignored even though the factory level has a larger impact on the total production. One reason for not optimizing on the factory level is the time needed due to the complexity of the line models making up the factory model. This licentiate thesis aims to validate and evaluate a model simplification technique to enable optimization of factories leading to cost and resource effective manufacturing.}
+    As society is rapidly changed by electrification, digitalization, and globalization, the automotive industry is particularly affected. 
+	Reacting to these changes requires predictive tools, the most common being Discrete-Event Simulation combined with Multi-Objective Optimization, referred to as Simulation-Based Optimization. 
+	Production lines are most often the focus for optimization while the factory level is ignored even though the factory level has a larger impact on the total production. 
+	One reason for not optimizing on the factory level is the time needed due to the complexity of the line models making up the factory model. 
+	This licentiate thesis aims to validate and evaluate a model simplification technique to enable optimization of factories leading to cost and resource effective manufacturing.}
 
     % Only if dissertation or thesis!
     \thesissammanfattning{\lipsum[1]}
@@ -77,10 +77,10 @@
     % Acknowledgements if you want to add those.
     \thesisacknowledgements{\lipsum[1]}
     
-    % Can be formatted in different ways, see the manual.
+    % Can be formatted in different ways, see the readme.
     \begin{ownpublications}
-    %\highrelevancepublications{fischer2017doctoraldissertationmanual,fischer2017doctoraldissertationmanual}
-        %\lowrelevancepublications{}
+        %\highrelevancepublications{fischer2017doctoraldissertationmanual,krishnamurthy2003manageroverview}
+        %\lowrelevancepublications{henkel2006revealingemblinux}
         %\authorspublication[Authors contribution]{fischer2017doctoraldissertationmanual}
         \authorspublication{fischer2017doctoraldissertationmanual}
         \authorspublication[Design, manuscript preparation, review]{fischer2017doctoraldissertationmanual}
@@ -96,14 +96,14 @@
 \part*{Frame of Reference}
 \input{chapters/2_FrameOfReference}
 
-\part*{Research Methodology}
-\input{chapters/3_Methods}
+%\part*{Research Methodology}
+%\input{chapters/3_Methods}
 
-\part*{Summary of Included Papers}
-\input{chapters/4_Results}
+%\part*{Summary of Included Papers}
+%\input{chapters/4_Results}
 
-\part*{Conclusions}
-\input{chapters/5_Conclusions}
+%\part*{Conclusions}
+%\input{chapters/5_Conclusions}
 
 % Start of back matter, appendix, list of references, included full text articles, and list of previous dissertations
 % List of references and list of previous dissertations are automatically placed using the backmatter environment, only the fullarticles environment is needed.
@@ -112,9 +112,9 @@
     % It's possible to specify what is written both before the reference and after.
     % \fullarticle[includepdf options]{reference}{pdf-file}[before][after]
     \begin{fullarticles}
-        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=-]{fischer2017doctoraldissertationmanual}{manual.pdf}[\href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{\ccbyncnd}]
-        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[\copyright{} 2018 University of Skövde. Reprinted, with permission, from]
-        \fullarticle[scale=.9,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[Reprinted from][with permission from University of Skövde.]
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=-]{fischer2017doctoraldissertationmanual}{manual.pdf}[\href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{\ccbyncnd}]
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[\copyright{} 2018 University of Skövde. Reprinted, with permission, from]
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[Reprinted from][with permission from University of Skövde.]
     \end{fullarticles}
 \end{backmatter}
 \end{document}
