@@ -1,4 +1,4 @@
-ensure_path( 'TEXINPUTS', './template//', '.' );
+ensure_path( 'TEXINPUTS', 'template//', '.' );
 $ENV{'TZ'}='Europe/Stockholm';
 $pdflatex = 'lualatex -file-line-error %O %S --shell-escape';
 $lualatex = "lualatex --shell-escape -file-line-error %O %S";
@@ -10,17 +10,27 @@ $clean_ext = 'synctex.gz synctex.gz(busy) run.xml tex.bak bbl bcf fdb_latexmk ru
 add_cus_dep('glo', 'gls', 0, 'run_makeglossaries');
 add_cus_dep('acn', 'acr', 0, 'run_makeglossaries');
 
+my $osname = $^O;
+
 sub run_makeglossaries {
     my ($base_name, $path) = fileparse( $_[0] ); #handle -outdir param by splitting path and file, ...
     pushd $path; # ... cd-ing into folder first, then running makeglossaries ...
 
     if ( $silent ) {
-        system "makeglossaries -q '$base_name'"; #unix
-        # system "makeglossaries", "-q", "$base_name"; #windows
+	    if( $osname eq 'MSWin32' ){
+		    system "makeglossaries", "-q", "$base_name"; #windows
+		}
+		else {
+            system "makeglossaries -q '$base_name'"; #unix
+		};
     }
     else {
-        system "makeglossaries '$base_name'"; #unix
-        # system "makeglossaries", "$base_name"; #windows
+		if( $osname eq 'MSWin32' ){
+		    system "makeglossaries", "$base_name"; #windows
+		}
+		else {
+            system "makeglossaries '$base_name'"; #unix
+		};  
     };
 
     popd; # ... and cd-ing back again
