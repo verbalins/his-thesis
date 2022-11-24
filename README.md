@@ -1,4 +1,4 @@
-# LaTeX templates for Unviersity of Skövde PhDs
+# LaTeX templates for University of Skövde PhDs
 This repo contains LaTeX templates for the PhD education at the University of Skövde. These include:
 
 - Doctoral Dissertation
