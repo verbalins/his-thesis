@@ -7,9 +7,7 @@ This repo contains LaTeX templates for the PhD education at the University of Sk
 - Research Proposal
 
 ## Requirements
-LuaLaTeX as the engine, change that in Overleaf.
-[TexLive](https://tug.org/texlive/)
-Updated to work in TexLive 2022.
+LuaLaTeX as the engine, change that in Overleaf. To compile locally you can use [TexLive](https://tug.org/texlive/). The files are updated to work in TexLive 2022.
 
 ## Installation
 Upload the package to Overleaf or use the Makefile to build locally.
