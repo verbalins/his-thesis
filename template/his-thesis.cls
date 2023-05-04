@@ -2086,8 +2086,8 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\vspace*{4mm}
 	{\fontarial{9.5}{11.5}\@subtitle\par}%
 	\vspace*{1cm}
-	{\fontarial{8.5}{10}\@authorUC\par}%
-	{\fontgeorgia{8}{9}\textit{\@subject}\par}%
+	{\isdissertation{\fontarial{8.5}{10}}{\fontarial{11.5}{13}}\@authorUC\par}%
+	{\isdissertation{\fontgeorgia{8}{9}}{\fontgeorgia{10}{11}}\textit{\@subject}\par}%
 	\vspace*{3cm plus 1cm minus 1cm}
 	\includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}\par%
 	\endgroup%
