@@ -148,10 +148,10 @@
 \newcommand{\@thesissummary}{\missingparam{thesissummary}}
 \newcommand{\thesissummary}[1]{\renewcommand{\@thesissummary}{#1}}
 
-\newcommand{\@coverimage}{\missingparam{coverimage}}
+\newcommand{\@coverimage}{Unset}
 \newcommand{\coverimage}[1]{\renewcommand{\@coverimage}{#1}}
 
-\newcommand{\@coverphoto}{\missingparam{coverphoto}}
+\newcommand{\@coverphoto}{Unset}
 \newcommand{\coverphoto}[1]{\renewcommand{\@coverphoto}{#1}}
 
 %%
@@ -1854,12 +1854,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\par%
 	%
 	% user content comes here
-	\IfSubStr{coverimage not set}{#1}
-	{\vspace*{8cm}} % Show empty space if image not supplied
+	\IfSubStr{Unset}{#1}
+	{\isdissertation{\vspace*{8cm}}\vspace*{12cm}} % Show empty space if image not supplied
 	{%
-		\IfSubStr{includegraphics}{#1}% Check if the user supplied an includegraphics command
-		{#1}%
-		{\includegraphics[width=\textwidth,height=8cm]{#1}}%
+		  \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
+		  {#1}%
+		  {\includegraphics[width=\textwidth,height=8cm]{#1}}%
 	}
 	% after user content:
 	\par%
@@ -1954,17 +1954,19 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 			\node[minimum width=35.05mm,minimum height=41.25mm](photobg){%
 			};% end of \node(photobg)
 		}
-		\node[left=0mm of photobg.south west,anchor=south west](photo){%
-		\isdissertation{%
-			\IfSubStr{includegraphics}{#1}%
-			{#1}%
-			{\includegraphics[height=37.25mm,width=31.05mm,keepaspectratio]{#1}}
-		}{%
-			\IfSubStr{includegraphics}{#1}%
-			{#1}%
-			{\includegraphics[height=41.25mm,width=35.05mm,keepaspectratio]{#1}}%
-		}
-		};% end of \node(photo)
+    		\IfSubStr{Unset}{#1}{}{
+		  	\node[left=0mm of photobg.south west,anchor=south west](photo){%
+		      		\isdissertation{%
+					\IfSubStr{includegraphics}{#1}%
+			     		{#1}%
+			     		{\includegraphics[height=37.25mm,width=31.05mm,keepaspectratio]{#1}}
+		      		}{%
+			     		\IfSubStr{includegraphics}{#1}%
+			     		{#1}%
+			     		{\includegraphics[height=41.25mm,width=35.05mm,keepaspectratio]{#1}}%
+		      		}
+			};
+    		}% end of \node(photo)
 
 
 		% Name
