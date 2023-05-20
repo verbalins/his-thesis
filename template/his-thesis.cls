@@ -678,7 +678,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
         {\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#2}}[\fullcite{#2} #5]}
         {\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#2}}[#4 \fullcite{#2} #5]}
     }% nice purple page with article's title, like special page for parts, but does not appear in ToC and does not try to make it uppercase
-\nopagecolor
+%\nopagecolor
 \ifthenelse{\boolean{@isfinal}}{%
     \newgeometry{margin=0cm}%
     \includepdf[#1,noautoscale,clip=true]{#3}% include article's PDF, but scale it to fit the smaller pages' size
@@ -2033,6 +2033,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\endgroup%
 	\clearpage
 }
+
+\renewcommand\baselinestretch{}
+\setlength\parskip{4.5\p@ \@plus0\p@}
+\parindent=\z@
 
 %%
 %% End of cover
