@@ -110,11 +110,11 @@
 \begin{backmatter}
     % Example of including full text articles in the manuscript.
     % It's possible to specify what is written both before the reference and after.
-    % \fullarticle[includepdf options]{reference}{pdf-file}[before][after]
+    % \fullarticle[includepdf options][before][after]{reference}{pdf-file}
     \begin{fullarticles}
-        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=-]{fischer2017doctoraldissertationmanual}{manual.pdf}[\href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{\ccbyncnd}]
-        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[\copyright{} 2018 University of Skövde. Reprinted, with permission, from]
-        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1]{fischer2017doctoraldissertationmanual}{manual.pdf}[Reprinted from][with permission from University of Skövde.]
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=-][\href{https://creativecommons.org/licenses/by-nc-nd/4.0/}{\ccbyncnd}]{fischer2017doctoraldissertationmanual}{manual.pdf}
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1][\copyright{} 2018 University of Skövde. Reprinted, with permission, from]{fischer2017doctoraldissertationmanual}{manual.pdf}
+        \fullarticle[scale=.7,trim={0mm 5mm 0mm 5mm},pages=1][Reprinted from][with permission from University of Skövde.]{fischer2017doctoraldissertationmanual}{manual.pdf}
     \end{fullarticles}
 \end{backmatter}
 \end{document}
