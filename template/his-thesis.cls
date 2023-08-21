@@ -1844,12 +1844,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\par%
 	%
 	% user content comes here
-	\IfSubStr{Unset}{#1}
-	{\isdissertation{\vspace*{8cm}}\vspace*{12cm}} % Show empty space if image not supplied
-	{%
-		  \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
-		  {#1}%
-		  {\includegraphics[width=\textwidth,height=8cm]{#1}}%
+	\IfSubStr{Unset}{#1}{
+            \isdissertation{\vspace*{8cm}}{\vspace*{12cm}} % Show empty space if image not supplied
+	}{%
+	    \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
+	    {#1}%
+	    {\includegraphics[width=\textwidth,height=8cm]{#1}}%
 	}
 	% after user content:
 	\par%
