@@ -141,8 +141,14 @@
 \newcommand{\@partnercompany}{\missingparam{partnercompany}}
 \newcommand{\partnercompany}[1]{\renewcommand{\@partnercompany}{#1}}
 
-\newcommand{\@partnercompanylogo}{\missingparam{partnercompanylogo}}
-\newcommand{\partnercompanylogo}[1]{\renewcommand{\@partnercompanylogo}{#1}}
+\newcommand{\@partnercompanylogo}{}
+\newcommand{\partnercompanylogo}[1]{\renewcommand{\@partnercompanylogofront}{#1}\renewcommand{\@partnercompanylogoback}{#1}}
+
+\newcommand{\@partnercompanylogofront}{\missingparam{partnercompanylogofront}}
+\newcommand{\partnercompanylogofront}[1]{\renewcommand{\@partnercompanylogofront}{#1}}
+
+\newcommand{\@partnercompanylogoback}{\missingparam{partnercompanylogoback}}
+\newcommand{\partnercompanylogoback}[1]{\renewcommand{\@partnercompanylogoback}{#1}}
 
 % CHANGE Add thesis abstract for back cover and spik
 \newcommand{\@thesissummary}{\missingparam{thesissummary}}
@@ -171,6 +177,9 @@
 \newboolean{@isfinal}
 \DeclareOption{final}{\setboolean{@isfinal}{true}}
 
+\newboolean{@isdraft}
+\DeclareOption{draft}{\setboolean{@isdraft}{true}}
+
 % Boolean to check dissertation status, true if doctoral or licentiate thesis
 \newboolean{@isdissertation}
 \DeclareOption{dissertation}{\setboolean{@isdissertation}{true} \publicationtype{dissertation}}
@@ -181,9 +190,11 @@
 
 \newcommand{\isdissertation}[2]{\ifthenelse{\boolean{@isdissertation}}{#1}{#2}}
 \newcommand{\isfinal}[2]{\ifthenelse{\boolean{@isfinal}}{#1}{#2}}
+\newcommand{\isdraft}[2]{\ifthenelse{\boolean{@isdraft}}{#1}{#2}}
 
 \newboolean{@usecover}
 \DeclareOption{cover}{\setboolean{@usecover}{true}}
+\newcommand{\iscover}[2]{\ifthenelse{\boolean{@usecover}}{#1}{#2}}
 
 %% Ten, eleven, and twelve point size options
 \newcommand\@ptsize{0}% FIXME necessary?
@@ -600,44 +611,57 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \DeclareBibliographyCategory{ownpublicationslowrelevance}
 \DeclareBibliographyCategory{ownpublications}
 
-\newenvironment{ownpublications}{%
-\isdissertation{\cleardoublepage}{\clearpage}
-\pdfbookmark[section]{Publications}{publications} % CHANGE To include an entry in the bookmarks section of the PDF
-\chapter*{Publications}%
-\sloppy
-%\phantomsection
-}{%
-%\clearpage%
-\fussy
-\setcounter{ownpublicationsenumi}{0}%
+\isdraft{
+    \newenvironment{ownpublications}{}{}
+}{
+    \newenvironment{ownpublications}{%
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \pdfbookmark[section]{Publications}{publications} % CHANGE To include an entry in the bookmarks section of the PDF
+        \chapter*{Publications}%
+        \sloppy
+        %\phantomsection
+    }{%
+        %\clearpage%
+        \fussy
+        \setcounter{ownpublicationsenumi}{0}%
+    }
 }
 
+
 \newcommand{\highrelevancepublications}[1]{%
-\begin{refcontext}[sorting=none]
-\addtocategory{ownpublicationshighrelevance}{#1}\nocite{#1}
-\printbibliography[heading=subbibliography,title=Publications with High Relevance,env=ownpublicationsbibenvironment,category=ownpublicationshighrelevance]
-\end{refcontext}
+\isdraft{}{
+    \begin{refcontext}[sorting=none]
+    \addtocategory{ownpublicationshighrelevance}{#1}\nocite{#1}
+    \printbibliography[heading=subbibliography,title=Publications with High Relevance,env=ownpublicationsbibenvironment,category=ownpublicationshighrelevance]
+    \end{refcontext}
+}
 }
 
 \newcommand{\lowrelevancepublications}[1]{%
-\begin{refcontext}[sorting=none]
-\addtocategory{ownpublicationslowrelevance}{#1}\nocite{#1}
-\printbibliography[heading=subbibliography,title=Publications with Low Relevance,env=ownpublicationsbibenvironment,category=ownpublicationslowrelevance]
-\end{refcontext}
+\isdraft{}{
+    \begin{refcontext}[sorting=none]
+    \addtocategory{ownpublicationslowrelevance}{#1}\nocite{#1}
+    \printbibliography[heading=subbibliography,title=Publications with Low Relevance,env=ownpublicationsbibenvironment,category=ownpublicationslowrelevance]
+    \end{refcontext}
+}
 }
 
 \newcommand{\authorspublications}[1]{%
-\begin{refcontext}[sorting=none]
-\addtocategory{ownpublications}{#1}\nocite{#1}
-\printbibliography[heading=none,env=ownpublicationsbibenvironment,category=ownpublications]
-\end{refcontext}
+\isdraft{}{
+    \begin{refcontext}[sorting=none]
+    \addtocategory{ownpublications}{#1}\nocite{#1}
+    \printbibliography[heading=none,env=ownpublicationsbibenvironment,category=ownpublications]
+    \end{refcontext}
+}
 }
 
 \newcommand{\authorspublication}[2][]{%
-\stepcounter{ownpublicationsenumi}%
-\subsection*{Paper \Roman{ownpublicationsenumi}}%
-\fullcite{#2}%
-\ifthenelse{\equal{#1}{}}{}{\par\textit{Author's contribution}: #1}% print optional author's contributions
+\isdraft{}{
+    \stepcounter{ownpublicationsenumi}%
+    \subsection*{Paper \Roman{ownpublicationsenumi}}%
+    \fullcite{#2}%
+    \ifthenelse{\equal{#1}{}}{}{\par\textit{Author's contribution}: #1}% print optional author's contributions
+}
 }
 
 % Retrieving a publication's title, without quotation marks or any other 'candy'.
@@ -928,19 +952,27 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
   \secdef\@part\@spart}% for part*, use @spart, for non-star part use @part
 
 \def\@part[#1]#2{%
-	\@beginpart
-     \begingroup\color{white}\raggedleft% \RaggedLeft
-     \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
-     \endgroup%
+    \@beginpart
+    \isdraft{%
+        \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
+    }{%
+        \begingroup\color{white}\raggedleft% \RaggedLeft
+        \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
+        \endgroup%
+    }
     \@endpart%
 }
 
 %% The actual formatting of the title of the part (star form)
 \def\@spart#1{%
     \@beginpart
-     \begingroup\color{white}\raggedleft% \RaggedLeft
-     \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
-     \endgroup%
+    \isdraft{%
+        \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
+    }{%
+        \begingroup\color{white}\raggedleft% \RaggedLeft
+        \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
+        \endgroup%
+    }
     \@endpart%
 }
 % CHANGED Do not count PART pages
@@ -948,43 +980,57 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \setcounter{mypagecount}{0}% set it to something just in case
 
 %% The actual formatting of the beginning of the part (both star and non-star forms)
-\def\@beginpart{%
-    \isdissertation{\cleardoublepage}{\clearpage}
-    \setcounter{mypagecount}{\value{page}} % CHANGED Do not count PART pages
-	\isdissertation{%
-		\isfinal{%
-		  \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
-		}{%
-		  % In non-final mode, i.e. when printing on A4, do not change paper size
-		}
-	}{%
-	}
-    
-    \null%\vfill
-    % Define a dark purple color used for page backgrounds
-    \newpagecolor{specialpagebackground}%
-    \markboth{}{}% no page header
-    \thispagestyle{empty}% no page numbers on just this page
-	%\vspace{34.74mm}%
-    \vspace*{44mm}% CHANGE Should be 70mm from top of paper
+\isdraft{%
+    \def\@beginpart{
+        \setcounter{mypagecount}{\value{page}}
+        \clearpage
+        \markboth{}{}% no page header
+        \thispagestyle{empty}% no page numbers on just this page
+        \vspace*{44mm}% CHANGE Should be 70mm from top of paper
+        }
+}{%
+    \def\@beginpart{%
+        \setcounter{mypagecount}{\value{page}} % CHANGED Do not count PART pages
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \isdissertation{%
+            \isfinal{%
+                \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
+            }{%
+    		  % In non-final mode, i.e. when printing on A4, do not change paper size
+            }
+        }{%
+        }
+        
+        \null%\vfill
+        % Define a dark purple color used for page backgrounds
+        \newpagecolor{specialpagebackground}%
+        \markboth{}{}% no page header
+        \thispagestyle{empty}% no page numbers on just this page
+        %\vspace{34.74mm}%
+        \vspace*{44mm}% CHANGE Should be 70mm from top of paper
+    }
 }
 
 %% The actual formatting of the end of the part (both star and non-star forms)
-\def\@endpart{%
-    \vfill
-    \isdissertation{\newpage}{}%
-    \null%
-    \thispagestyle{empty}%
-    \isdissertation{%
-		\isfinal{%
-		  \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
-		}{%
-		  % In non-final mode, i.e. when printing on A4, do not change paper size
-		}
-	}{}%
-    \isdissertation{\newpage}{\clearpage}%
-    \setcounter{page}{\value{mypagecount}} % CHANGED Do not count PART pages
-    \restorepagecolor% restore original page color
+\isdraft{%
+    \def\@endpart{\setcounter{page}{\value{mypagecount}}}
+}{%
+    \def\@endpart{%
+        \vfill
+        \isdissertation{\newpage}{}%
+        \null%
+        \thispagestyle{empty}%
+        \isdissertation{%
+        		\isfinal{%
+        		  \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
+        		}{%
+        		  % In non-final mode, i.e. when printing on A4, do not change paper size
+        		}
+        }{}%
+        \isdissertation{\newpage}{\clearpage}%
+        \setcounter{page}{\value{mypagecount}} % CHANGED Do not count PART pages
+        \restorepagecolor% restore original page color
+    }
 }
 
 %%
@@ -996,7 +1042,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %% Chapters
 %%
 
-\newcommand\chapter{\isdissertation{\cleardoublepage}{\clearpage}% chapter shall start on a fresh right page if dissertation
+\newcommand\chapter{\isdraft{\clearpage}{\isdissertation{\cleardoublepage}{\clearpage}}% chapter shall start on a fresh right page if dissertation
                     \thispagestyle{footeronly} % CHANGE No heading on first page of chapter
                     \global\@topnum\z@% ???
                     \@afterindentfalse% ???
@@ -1818,10 +1864,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\begin{tikzpicture}[inner sep=0pt]%
 	% background image in rubin/purple using the laurel branch for dissertation and licentiate. None for the proposals.
 	\ifthenelse{\equal{\@publicationtype}{dissertation}}{% if dissertation ...
-		\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=250mm,keepaspectratio]{logos/laurelbranch-rubin}};%
+		\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-rubin}};%
 	}{%
 		\ifthenelse{\equal{\@publicationtype}{licentiate}}{% if licentiate ...
-			\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=250mm,keepaspectratio]{logos/laurelbranch-grafit}};%
+			\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-grafit}};%
 		}{%
 		% no background image for 'thesisproposal' or 'researchproposal'
 		}% end of if licentiate
@@ -1830,13 +1876,13 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\end{textblock}%
 
 	\isdissertation{%
-		\isfinal{
-			\begin{textblock}{138}(18,21) % Doctoral / licentiate dissertation
-		}{
+		  \isfinal{
+		    \begin{textblock}{138}(18,21) % Doctoral / licentiate dissertation
+		  }{
 			\begin{textblock}{138}(39,49.5) % Doctoral / licentiate dissertation
-		}
+		  }
 	}{%
-	  \begin{textblock}{176}(18,21) % Research Proposal / Thesis Proposal
+	      \begin{textblock}{176}(18,21) % Research Proposal / Thesis Proposal
 	}
 	% Coat of Arms on page's top left side
 	\includegraphics[height=35mm,width=35mm,keepaspectratio]{logos/HiSCoatOfArms-white-\languagename}%
@@ -1845,11 +1891,11 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	%
 	% user content comes here
 	\IfSubStr{Unset}{#1}{
-            \isdissertation{\vspace*{8cm}}{\vspace*{12cm}} % Show empty space if image not supplied
+          \isdissertation{\vspace*{8cm}}{\vspace*{12cm}} % Show empty space if image not supplied
 	}{%
-	    \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
-	    {#1}%
-	    {\includegraphics[width=\textwidth,height=8cm]{#1}}%
+		  \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
+		  {#1}%
+		  {\includegraphics[width=\textwidth,height=8cm]{#1}}%
 	}
 	% after user content:
 	\par%
@@ -1868,15 +1914,15 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 		%\end{fitbox}%
 		\par\endgroup
 
-		\vspace*{4mm}%
+		\vspace*{2mm}%
 
-		% CHANGE Check if subtitle is defined in metadata.tex
+		% CHANGE Check if subtitle is defined in metadata.tex 
 		% If defined, show it with the same command as the title
 		% Else, just skip with the same amount of space. This gives the author and subject a fixed position
 		\ifthenelse{\equal{\@subtitleUC}{~}}{%
 			\vspace*{5mm}%
 		}{%
-			\begingroup\fontarial{14.5}{14.5}%
+			\begingroup\fontarial{14}{14}%
 			%\begin{fitbox}{\linewidth}{5mm} % CHANGE Include the new function here to constrain the subtitle
 			\@subtitle
 			%\end{fitbox}%
@@ -2002,8 +2048,8 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 				}
 				\MakeUppercase{In collaboration with}\par\endgroup%
 			};% end of \node(collaborationlabel)
-			\node[below=4mm of collaborationlabel](collaborationlogo){%
-			\includegraphics[width=27.5mm,height=27.5mm,keepaspectratio]{\@partnercompanylogo}%
+			\node[below=1cm of collaborationlabel](collaborationlogo){%
+                  \includegraphics[width=27.5mm,height=27.5mm,keepaspectratio]{\@partnercompanylogoback}
 			};% end of \node(collaborationlogo)
 		}{}% end of "only if collaboration partner is defined ..."
 
@@ -2036,6 +2082,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %% Titlepage
 %% 
 \renewcommand{\maketitle}{%
+        \isdraft{}{
 	\pagestyle{empty}
 	\setcounter{page}{0}
 
@@ -2065,43 +2112,47 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 	\begingroup%
 	\centering%
-	\vspace*{3cm plus 2cm minus 2cm}
-	{\fontgeorgia{11.5}{11.5}\MakeUppercase{\@publicationtypelong}\par}%
-	\vspace*{4mm}
-	\textls[125]{% increase letter spacing by 125/1000em
-		\color{newgray}\fontarial{12.5}{16} % CHANGE New gray color
-		\newdimen\origiwspc%
-		\origiwspc=\fontdimen2\font% original inter word space
-		\fontdimen2\font=0.5em% inter word space
+	\vspace*{4cm plus 2cm minus 2cm}
+	{\fontgeorgia{9.5}{9.5}\MakeUppercase{\@publicationtypelong}\par}%
+	%\vspace*{4mm}
+	%\textls[125]{% increase letter spacing by 125/1000em
+		\color{newgray}{\fontarial{13.5}{16} % CHANGE New gray color
+		%\newdimen\origiwspc%
+		%\origiwspc=\fontdimen2\font% original inter word space
+		%\fontdimen2\font=0.5em% inter word space
 		\@titleUC%
-		\fontdimen2\font=\origiwspc% (original) inter word space
+		%\fontdimen2\font=\origiwspc% (original) inter word space
 		\par%
-	}% textls
+        }
+        \color{black}
+	%}% textls
 	\vspace*{4mm}
 	{\fontarial{9.5}{11.5}\@subtitle\par}%
-	\vspace*{1cm}
-	{\isdissertation{\fontarial{8.5}{10}}{\fontarial{11.5}{13}}\@authorUC\par}%
-	{\isdissertation{\fontgeorgia{8}{9}}{\fontgeorgia{10}{11}}\textit{\@subject}\par}%
-	\vspace*{3cm plus 1cm minus 1cm}
+	\vspace*{2cm}
+	{\isdissertation{\fontarial{9.5}{10}}{\fontarial{11.5}{13}}\@authorUC\par}%
+	{\isdissertation{\fontgeorgia{9.5}{9}}{\fontgeorgia{10}{11}}\textit{\@subject}\par}%
+	\vspace*{5cm plus 1cm minus 1cm}
 	\includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}\par%
 	\endgroup%
 
 	\clearpage%
 	\vspace*{\fill}%
 	\iscollaboration{% Include Company logo if supplied
-		{\centering\includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{\@partnercompanylogo}\par}% 
+		{\centering
+         \includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{\@partnercompanylogofront}
+         \par}% 
 	}{%
 		{\centering\par }
 	}%
 	\vspace*{\fill}\par%
 	\begingroup%
 	{\centering%
-		\fontgeorgia{11.5}{14}%
+		\fontgeorgia{12}{14}%
 		\@author, \@date%
 		\smallskip\par%
-		{\fontgeorgia{9.5}{12}\@publicationtypelong\smallskip\par}%
+		%{\fontgeorgia{9.5}{12}\@publicationtypelong\smallskip\par}%
 		{\fontgeorgia{12}{15}\textit{Title:} \@title\par}%
-		{\fontgeorgia{8.5}{10}\ifthenelse{\equal{\@subtitle}{}}{}{\@subtitle\par}}%
+		{\fontgeorgia{9.5}{10}\ifthenelse{\equal{\@subtitle}{}}{}{\@subtitle\par}}%
 		\medskip%
 		University of Skövde \@date, Sweden\\%
 		\href{https://www.his.se/}{www.his.se}
@@ -2110,12 +2161,13 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 			\textit{Printer:} \@printshop
 			\medskip\par%
 			ISBN \@isbn\par%
-			Dissertation Series No. \@seriesnumber~(\@date)%
+			Dissertation Series, No. \@seriesnumber~(\@date)%
 		}{%
 		}
 	\par}%
 	\endgroup%
 	\@titlepagefalse
+ }
 }% END \newcommand{\maketitle}
 %%
 %% End of Title page
@@ -2126,26 +2178,31 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %%
 
 \newcommand{\thesisabstract}[1]{%
-	\isdissertation{\cleardoublepage}{\clearpage}
-	\pdfbookmark[section]{Abstract}{abstract} % CHANGE To include an entry in the bookmarks section of the PDF
-	\chapter*{Abstract}
-	#1
+    \isdraft{}{%
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \pdfbookmark[section]{Abstract}{abstract} % CHANGE To include an entry in the bookmarks section of the PDF
+        \chapter*{Abstract}
+        #1}
 }
 
 \newcommand{\thesissammanfattning}[1]{%
-	\isdissertation{\cleardoublepage}{\clearpage}
-	\pdfbookmark[section]{Sammanfattning}{sammanfattning} % CHANGE To include an entry in the bookmarks section of the PDF
-	\begin{otherlanguage}{swedish}
-	\chapter*{Sammanfattning}
-	#1
-	\end{otherlanguage}
+    \isdraft{}{%
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \pdfbookmark[section]{Sammanfattning}{sammanfattning} % CHANGE To include an entry in the bookmarks section of the PDF
+        \begin{otherlanguage}{swedish}
+        \chapter*{Sammanfattning}
+        #1
+        \end{otherlanguage}
+    }
 }
 
 \newcommand{\thesisacknowledgements}[1]{%
-	\isdissertation{\cleardoublepage}{\clearpage}
-	\pdfbookmark[section]{Acknowledgements}{acknowledgements} % CHANGE To include an entry in the bookmarks section of the PDF
-	\chapter*{Acknowledgements}
-	#1
+    \isdraft{}{%
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \pdfbookmark[section]{Acknowledgements}{acknowledgements} % CHANGE To include an entry in the bookmarks section of the PDF
+        \chapter*{Acknowledgements}
+        #1
+    }
 }
 
 \usepackage[titles]{tocloft}
@@ -2177,80 +2234,100 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     %\renewcommand{\cftsetpnumwidth}{0.5em}
 
 % Front matter specification
-\renewenvironment{frontmatter}{%
-	%\hypersetup{pageanchor=false}
-    \ifthenelse{\boolean{@usecover}}{%
-        \renewcommand{\nopagecolor}{specialpagebackgroundcover}%
-        \newpagecolor{specialpagebackgroundcover}%
-		\pagenumbering{arabic}
-		\pagestyle{empty}
-		\newpage
-		\internalcoverpage{\@coverimage}
-        \newpage
-        \restorepagecolor
-		\restoregeometry
-    }{}
-	\@titlepagetrue
-    \maketitle
-	\@titlepagefalse
-    \clearpage
-    \markboth{}{}% no page header
-    %\hypersetup{pageanchor=true}
-	\pagenumbering{Roman}% Switch to Roman page numbers
-    \setcounter{page}{1}% Start page numbers from 'I' (Roman 1)
-    \pagestyle{footeronly}
-    \justifying
-    
-    % Set default font
-    \isdissertation{%
-        \fontgeorgia{9.5}{11}
-    }{%
-        \fontgeorgia{11}{12.5}
-    }%
-}{%
-    \tableofcontents
-    \listoffigures
-    \listoftables
-    
-    \@ifpackageloaded{glossaries-extra}{
-      \isdissertation{\cleardoublepage}{\clearpage}
-      \pdfbookmark[section]{Abbreviations}{abbreviations} % CHANGE To include an entry in the bookmarks section of the PDF
-      \chapter*{Abbreviations}
-      \renewcommand{\glossarysection}[2][]{} % Remove the added section in printglossary
-      \printglossary
+\isdraft{%
+    \renewenvironment{frontmatter}{%
+        \isdissertation{%
+            \fontgeorgia{9.5}{11}
+        }{%
+            \fontgeorgia{11}{12.5}
+        }%
     }{
+        \pagestyle{headings}
+        	\pagenumbering{arabic}% Switch to Arabic page numbers
+        \setcounter{page}{1}% Start page numbers from '1'
+    	  \mainmatter
     }
-    
-    \isdissertation{\cleardoublepage}{\clearpage}
-    \pagestyle{headings}
-	\pagenumbering{arabic}% Switch to Arabic page numbers
-    \setcounter{page}{1}% Start page numbers from '1'
-	\mainmatter
+}{%
+    \renewenvironment{frontmatter}{%
+    	%\hypersetup{pageanchor=false}
+        \iscover{%
+            \renewcommand{\nopagecolor}{specialpagebackgroundcover}%
+            \newpagecolor{specialpagebackgroundcover}%
+    		\pagenumbering{arabic}
+    		\pagestyle{empty}
+    		\newpage
+    		\internalcoverpage{\@coverimage}
+            \newpage
+            \restorepagecolor
+    		\restoregeometry
+        }{}
+    	\@titlepagetrue
+        \maketitle
+    	\@titlepagefalse
+        \clearpage
+        \markboth{}{}% no page header
+        %\hypersetup{pageanchor=true}
+    	\pagenumbering{Roman}% Switch to Roman page numbers
+        \setcounter{page}{1}% Start page numbers from 'I' (Roman 1)
+        \pagestyle{footeronly}
+        \justifying
+        
+        
+        % Set default font
+        \isdissertation{%
+            \fontgeorgia{9.5}{11}
+        }{%
+            \fontgeorgia{11}{12.5}
+        }%
+    }{%
+        \tableofcontents
+        \listoffigures
+        \listoftables
+        
+        \@ifpackageloaded{glossaries-extra}{
+          \isdissertation{\cleardoublepage}{\clearpage}
+          \pdfbookmark[section]{Abbreviations}{abbreviations} % CHANGE To include an entry in the bookmarks section of the PDF
+          \chapter*{Abbreviations}
+          \renewcommand{\glossarysection}[2][]{} % Remove the added section in printglossary
+          \printglossary
+        }{
+        }
+        
+        \isdissertation{\cleardoublepage}{\clearpage}
+        \pagestyle{headings}
+        \pagenumbering{arabic}% Switch to Arabic page numbers
+        \setcounter{page}{1}% Start page numbers from '1'
+        \mainmatter
+    }
 }
 
-\renewenvironment{backmatter}{%
-    \@mainmatterfalse
-    \sloppy
-    \listofreferences
-}{%
-    \dissertationlist
-    \fussy
-    \ifthenelse{\boolean{@usecover}}{%
-		\isdissertation{\cleardoublepage}{\clearpage}
-        \newpagecolor{specialpagebackgroundcover}%
-		\pagestyle{empty}
-		\ifthenelse{\boolean{@isfinal}}{}{
-			\newgeometry{showcrop=false}
-		}
-		
-		\isdissertation{%
-			\eject \pdfpagewidth 198mm \pdfpageheight 250mm% Set paper size to 198mm x 250mm
-			\newpage
-			\internalbookspine
-		}{%
-		}
-        \internallastpage{\@coverphoto}%
-    }{}
+\isdraft{
+    \renewenvironment{backmatter}{}{}
+}{
+    \renewenvironment{backmatter}{%
+        \@mainmatterfalse
+        \sloppy
+        \listofreferences
+    }{%
+        \dissertationlist
+        \fussy
+        \iscover{%
+    		\isdissertation{\cleardoublepage}{\clearpage}
+            \newpagecolor{specialpagebackgroundcover}%
+    		\pagestyle{empty}
+    		\ifthenelse{\boolean{@isfinal}}{}{
+    			\newgeometry{showcrop=false}
+    		}
+    		
+    		\isdissertation{%
+    			\eject \pdfpagewidth 198mm \pdfpageheight 250mm% Set paper size to 198mm x 250mm
+    			\newpage
+    			\internalbookspine
+    		}{%
+    		}
+            \internallastpage{\@coverphoto}%
+        }{}
+    }
 }
 
 %%
@@ -2288,7 +2365,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \input{metadata}
 
 \newboolean{@iscollaboration}
-\ifthenelse{\equal{\@partnercompany}{\missingparam{partnercompany}} \OR \equal{\@partnercompanylogo}{\missingparam{partnercompanylogo}}}
+\ifthenelse{\equal{\@partnercompany}{\missingparam{partnercompany}} \OR \equal{\@partnercompanylogofront}{\missingparam{partnercompanylogofront}} \OR \equal{\@partnercompanylogoback}{\missingparam{partnercompanylogoback}}}
 {\setboolean{@iscollaboration}{false}}{\setboolean{@iscollaboration}{true}}
 \newcommand{\iscollaboration}[2]{\ifthenelse{\boolean{@iscollaboration}}{#1}{#2}}
 

@@ -36,8 +36,11 @@ If successful, you should see an example-thesis.pdf containing the example repor
 - `thesisproposal`: For thesis proposals
 - `researchproposal`: For research proposals
 
-These are optional and both can be supplied:
-- `final`: Indicates the final version of the manuscript.
+Optional **One** of the following to define output mode:
+- `draft`: Sets draft mode. Removes front and back matter, only shows parts and chapters, i.e., the main parts of the manuscript.
+- `final`: Typesets the manuscript as it would look like for printing and publishing.
+
+Optional to add cover pages when `draft` is not set:
 - `cover`: Create cover pages if supplied.
 
 Example could look like this to create a doctoral dissertation in English, with the final format, and front and back covers.
@@ -47,20 +50,30 @@ Example could look like this to create a doctoral dissertation in English, with 
 
 ## Specific commands for the template
 ### metadata.tex
+If you are writing your thesis together with another company, supply the name and logo here.
+
 ```latex
 %% Define partner company name and logo.
 %% To be used if you are performing the work in collaboration with a company.
 \partnercompany{Company AB}
 \partnercompanylogo{img/companylogo.png}
 ```
-If you are writing your thesis together with another company, supply the name and logo here.
+An alternate way of supplying the partnercompanylogo is to specify the first and second logo separately.
+```latex
+%% Define partner company name and logo.
+%% To be used if you are performing the work in collaboration with a company.
+\partnercompany{Company AB}
+\partnercompanylogofront{img/companylogo-front.png}
+\partnercompanylogoback{img/companylogo-back.png}
+```
+This can be useful as the legibility of the second logo, printed on the back, could be hard to read with the colored background of the cover. A black logo on the imprint page, and a white logo on the back cover, could improve legibility.
 
+Sets the front cover image, which is optional, and the back cover photo which is required for the printed copy.
 ```latex
 %% The path to an image on the front cover, and an image of you on the back cover.
 \coverimage{template/Manuscript/foto.jpg}
 \coverphoto{template/Manuscript/face.jpg}
 ```
-Sets the front cover image, which is optional, and the back cover photo which is required.
 
 ## Difference between thesis and proposal
 The publicationtype of `dissertation` and `licentiate` are special, as they are requirements towards a degree. These will be typeset as a book, with special page size, contents, and colors. These follow the guidelines at the university [page](https://www.his.se/forskning/doktorandhandbok/disputation/avhandlingsmallar/) (in Swedish).
