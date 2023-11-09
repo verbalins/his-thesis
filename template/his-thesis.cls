@@ -689,7 +689,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\stepcounter{ownpublicationsenumi}
 	\isdissertation{\cleardoublepage}{\clearpage}
 	\phantomsection
-	\addcontentsline{toc}{section}{\texorpdfstring{Paper~\Roman{ownpublicationsenumi}: \citetitleverbatim{#2}}{Paper~\Roman{ownpublicationsenumi}}}% CHANGE added texorpdfstring to fix hyperref linking. % section-like line in ToC, but does not appear in main text body
+	\addcontentsline{toc}{section}{\texorpdfstring{Paper~\Roman{ownpublicationsenumi}: \citetitleverbatim{#4}}{Paper~\Roman{ownpublicationsenumi}}}% CHANGE added texorpdfstring to fix hyperref linking. % section-like line in ToC, but does not appear in main text body
 	\IfNoValueTF {#2}%
 		{ \IfNoValueTF {#3}% No value for #2, then check #3.
 			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}}
