@@ -533,7 +533,7 @@
 %% ????
 
 %% For letter-spacing
-\RequirePackage{soulutf8}
+\RequirePackage{soul}
 % ???
 \sodef\an{}{.095em}{0.35em plus0.35em}{2em plus.5em minus.5em}
 \newcommand*\MyUpperCase[1]{\MakeUppercase{\an {#1}}}
