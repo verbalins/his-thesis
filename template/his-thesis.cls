@@ -254,6 +254,11 @@
 \PassOptionsToPackage{pdfpagelabels=false}{hyperref}
 %\PassOptionsToPackage{positioning,fit,calc}
 \RequirePackage{tikz}
+\pgfkeys{/pgf/images/include external/.code=\includegraphics{#1}}
+
+\isdraft{%
+    \usetikzlibrary{external}\tikzexternalize[prefix=tikz/,optimize command away=\includepdf]
+}{}
 
 % Translations with babel
 \RequirePackage{babel}
@@ -932,18 +937,6 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
    \IfNoValueTF{#3}%
         {}%
         {\medskip\par\begingroup\fontarial{9.5}{10.5}#3\par\endgroup}%
-   \endgroup%
-  \@endpart%
-}
-
-% Hack to get two optional arguments into \partlike
-% see: http://www.tex.ac.uk/FAQ-twooptarg.html
-\newcommand{\partlikeRelay}[2][]{%
-  \@beginpart
-   \begingroup\color{white}\raggedleft% \RaggedLeft
-   \ifthenelse{\equal{\OptArgPartlike}{}}{}{\begingroup\fontarial{13.5}{15.0}\OptArgPartlike\par\endgroup}%
-   \begingroup\fontarial{16.5}{21.0}#2\par\endgroup%
-   \ifthenelse{\equal{#1}{}}{}{\medskip\par\begingroup\fontarial{9.5}{10.5}#1\par\endgroup}%
    \endgroup%
   \@endpart%
 }
