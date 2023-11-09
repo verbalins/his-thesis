@@ -2015,9 +2015,9 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 		\node[below=5mm of photobg.south west,anchor=north west,text width=\abstractSize,text justified](abstract){%
 			\begingroup
 			\isdissertation{%
-				\fontarial{11}{12}%
+				    \fontarial{11}{12}%
 			}{%
-				\fontarial{13}{14.5}%
+				    \fontarial{13}{14.5}%
 			}
 			
 			% user content comes here
@@ -2086,7 +2086,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 		\centering%
 		\vspace*{5.6cm}% value taken from Word template
 		\begingroup%
-		\fontarial{9.5}{12}%
+        \isdissertation{%
+            \fontarial{9.5}{12}%
+        }{
+            \fontarial{12}{14.5}%
+        }
+		
 		\textls[125]{% increase letter spacing by 125/1000em
 			\newdimen\origiwspc%
 		    \origiwspc=\fontdimen2\font% original inter word space
@@ -2096,7 +2101,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 			\par%
 		}% textls
 		\endgroup%
-		\fontarial{9.5}{10.5}\@subtitle%
+		\fontarial{9.5}{10.5}
+        \isdissertation{%
+            \fontarial{9.5}{10.5}%
+        }{
+            \fontarial{10.5}{12}%
+        }\@subtitle%
 		\par%
 		\endgroup
 	}{%
@@ -2107,10 +2117,11 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\begingroup%
 	\centering%
 	\vspace*{4cm plus 2cm minus 2cm}
-	{\fontgeorgia{9.5}{9.5}\MakeUppercase{\@publicationtypelong}\par}%
+	{\isdissertation{\fontgeorgia{9.5}{9.5}}{\fontgeorgia{12}{12}}\MakeUppercase{\@publicationtypelong}\par}%
 	%\vspace*{4mm}
 	%\textls[125]{% increase letter spacing by 125/1000em
-		\color{newgray}{\fontarial{13.5}{16} % CHANGE New gray color
+		\color{newgray}{%
+        \isdissertation{\fontarial{13.5}{16}}{\fontarial{16}{18.5}}
 		%\newdimen\origiwspc%
 		%\origiwspc=\fontdimen2\font% original inter word space
 		%\fontdimen2\font=0.5em% inter word space
@@ -2121,12 +2132,16 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
         \color{black}
 	%}% textls
 	\vspace*{4mm}
-	{\fontarial{9.5}{11.5}\@subtitle\par}%
+	{\isdissertation{\fontarial{9.5}{11.5}}{\fontarial{11.5}{14}}\@subtitle\par}%
 	\vspace*{2cm}
 	{\isdissertation{\fontarial{9.5}{10}}{\fontarial{11.5}{13}}\@authorUC\par}%
 	{\isdissertation{\fontgeorgia{9.5}{9}}{\fontgeorgia{10}{11}}\textit{\@subject}\par}%
-	\vspace*{5cm plus 1cm minus 1cm}
-	\includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}\par%
+	\isdissertation{\vspace*{5cm plus 1cm minus 1cm}}{\vspace*{8cm plus 1cm minus 1cm}}
+        \isdissertation{
+	   \includegraphics[width=3.33cm,height=3.39cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
+        }{%
+          \includegraphics[width=4.5cm,height=4.5cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
+        }\par%
 	\endgroup%
 
 	\clearpage%
@@ -2141,12 +2156,13 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\vspace*{\fill}\par%
 	\begingroup%
 	{\centering%
-		\fontgeorgia{12}{14}%
+		\isdissertation{\fontgeorgia{12}{14}}{\fontgeorgia{14}{16}}%
 		\@author, \@date%
-		\smallskip\par%
+		\bigskip\par%
 		%{\fontgeorgia{9.5}{12}\@publicationtypelong\smallskip\par}%
-		{\fontgeorgia{12}{15}\textit{Title:} \@title\par}%
-		{\fontgeorgia{9.5}{10}\ifthenelse{\equal{\@subtitle}{}}{}{\@subtitle\par}}%
+        \isdissertation{\fontgeorgia{9.5}{10}}{\fontgeorgia{10}{12.5}}
+		{\textit{Title:} \@title\par}%
+		{\ifthenelse{\equal{\@subtitle}{}}{}{\@subtitle\par}}%
 		\medskip%
 		University of Skövde \@date, Sweden\\%
 		\href{https://www.his.se/}{www.his.se}
@@ -2199,32 +2215,40 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     }
 }
 
+\newcommand{\selectedfont}{%
+    \isdissertation{%
+        \fontarial{9}{11}
+    }{%
+        \fontarial{11}{12.5} 
+    }
+}
+
 \usepackage[titles]{tocloft}
     \renewcommand{\cftdotsep}{1}
-    \renewcommand{\cftpartfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cftpartpagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cftpartfont}{\selectedfont}
+    \renewcommand{\cftpartpagefont}{\selectedfont}
     \renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}}
     
     \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-    \renewcommand{\cftchapfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cftchappagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cftchapfont}{\selectedfont}
+    \renewcommand{\cftchappagefont}{\selectedfont}
     
-    \renewcommand{\cftsecfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cftsecpagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cftsecfont}{\selectedfont}
+    \renewcommand{\cftsecpagefont}{\selectedfont}
     
-    \renewcommand{\cftsubsecfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cftsubsecpagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cftsubsecfont}{\selectedfont}
+    \renewcommand{\cftsubsecpagefont}{\selectedfont}
     
-    \renewcommand{\cftfigfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cftfigpagefont}{\fontarial{9.5}{11}}
-    %\renewcommand{\cftsubfigfont}{\fontarial{9.5}{11}}
-    %\renewcommand{\cftsubfigpagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cftfigfont}{\selectedfont}
+    \renewcommand{\cftfigpagefont}{\selectedfont}
+    %\renewcommand{\cftsubfigfont}{\selectedfont}
+    %\renewcommand{\cftsubfigpagefont}{\selectedfont}
     
-    \renewcommand{\cfttabfont}{\fontarial{9.5}{11}}
-    \renewcommand{\cfttabpagefont}{\fontarial{9.5}{11}}
+    \renewcommand{\cfttabfont}{\selectedfont}
+    \renewcommand{\cfttabpagefont}{\selectedfont}
     %\renewcommand{\cfttabindent}{\cftchapindent}
-    %\renewcommand{\cftsubtabfont}{\fontarial{9.5}{11}}
-    %\renewcommand{\cftsubtabpagefont}{\fontarial{9.5}{11}}
+    %\renewcommand{\cftsubtabfont}{\selectedfont}
+    %\renewcommand{\cftsubtabpagefont}{\selectedfont}
     %\renewcommand{\cftsetpnumwidth}{0.5em}
 
 % Front matter specification
