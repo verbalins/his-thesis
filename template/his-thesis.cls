@@ -930,7 +930,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 % #1 is upper text, #2 is middle text, and #3 is lower text. #1 and #3 are optional.
 \NewDocumentCommand\partlike{O{}mO{}}{% CHANGE Now allows for additional optional parameters.
   \@beginpart
-   \begingroup\color{white}\raggedleft% \RaggedLeft
+   \begingroup\color{white}\isdissertation{\raggedleft}{}% \RaggedLeft
    \IfNoValueTF{#1}%
         {\begingroup\fontarial{13.5}{15.0} \par\endgroup}%
         {\begingroup\fontarial{13.5}{15.0}#1\par\endgroup}%
@@ -950,7 +950,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     \isdraft{%
         \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
     }{%
-        \begingroup\color{white}\raggedleft% \RaggedLeft
+        \begingroup\color{white}\isdissertation{\raggedleft}{}% \RaggedLeft
         \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
         \endgroup%
     }
@@ -963,7 +963,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     \isdraft{%
         \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
     }{%
-        \begingroup\color{white}\raggedleft% \RaggedLeft
+        \begingroup\color{white}\isdissertation{\raggedleft}{}% \RaggedLeft
         \begingroup\fontarial{16.5}{21.0}\MyUpperCase{#1}\par\endgroup%
         \endgroup%
     }
