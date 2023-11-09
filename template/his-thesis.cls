@@ -182,6 +182,7 @@
 
 % Boolean to check dissertation status, true if doctoral or licentiate thesis
 \newboolean{@isdissertation}
+\setboolean{@isdissertation}{false}
 \DeclareOption{dissertation}{\setboolean{@isdissertation}{true} \publicationtype{dissertation}}
 \DeclareOption{licentiate}{\setboolean{@isdissertation}{true} \publicationtype{licentiate}}
 
@@ -2302,7 +2303,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
         \sloppy
         \listofreferences
     }{%
-        \dissertationlist
+        \isdissertation{\dissertationlist}{}
         \fussy
         \iscover{%
     		\isdissertation{\cleardoublepage}{\clearpage}
