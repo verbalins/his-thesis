@@ -18,7 +18,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 %%
-%% Copyright 2021-2023 by Simon Lidberg <simon.lidberg@his.se> based on
+%% Copyright 2021-2024 by Simon Lidberg <simon.lidberg@his.se> based on
 %%   original code by Thomas Fischer <thomas.fischer@his.se>
 %% 
 %% This file has been released under the following license:
@@ -26,7 +26,7 @@
 %% (CC-BY-SA 4.0)
 %%
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{his-thesis}[2018/03/07]
+\ProvidesClass{his-thesis}[2023-11-21]
 
 % Necessary for included LaTeX classes
 \newif\if@titlepage%
@@ -57,7 +57,6 @@
 
 \newcommand\@subject{\missingparam{subject}}
 \newcommand\subject[1]{\renewcommand\@subject{#1}}
-\subject{Informatics}
 
 \renewcommand{\@title}{\missingparam{title}}
 \newcommand{\@titleUC}{\missingparam{title}}
@@ -75,8 +74,11 @@
 \newcommand{\dissertationarea}[1]{\renewcommand{\@dissertationarea}{#1}}
 \dissertationarea{\@subject}
 %
-\newcommand{\@isbn}{\missingparam{isbn}}
-\newcommand{\isbn}[1]{\renewcommand{\@isbn}{#1}}
+\newcommand{\@isbnprint}{\missingparam{isbnprint}}
+\newcommand{\isbnprint}[1]{\renewcommand{\@isbnprint}{#1}}
+%
+\newcommand{\@isbnonline}{\missingparam{isbnonline}}
+\newcommand{\isbnonline}[1]{\renewcommand{\@isbnonline}{#1}}
 %
 \newcommand{\@printshop}{\missingparam{printshop}}
 \newcommand{\printshop}[1]{\renewcommand{\@printshop}{#1}}
@@ -141,14 +143,24 @@
 \newcommand{\@partnercompany}{\missingparam{partnercompany}}
 \newcommand{\partnercompany}[1]{\renewcommand{\@partnercompany}{#1}}
 
+% Filename of logo of partner company (do not use command if not)
+% Command takes one optional argument for alternate logo for use on colorful cover, so logo should be preferrably white
 \newcommand{\@partnercompanylogo}{}
-\newcommand{\partnercompanylogo}[1]{\renewcommand{\@partnercompanylogofront}{#1}\renewcommand{\@partnercompanylogoback}{#1}}
+\newcommand{\@partnercompanylogowhite}{}
+\newcommand{\partnercompanylogo}[2][]{%
+  \renewcommand{\@partnercompanylogo}{#2}%
+  \ifthenelse{\equal{#1}{}}{\renewcommand{\@partnercompanylogowhite}{#2}}{\renewcommand{\@partnercompanylogowhite}{#1}}%
+}
 
-\newcommand{\@partnercompanylogofront}{\missingparam{partnercompanylogofront}}
-\newcommand{\partnercompanylogofront}[1]{\renewcommand{\@partnercompanylogofront}{#1}}
+% Filename of logo of another partner company (do not use command if not)
+% Command takes one optional argument for alternate logo for use on colorful cover, so logo should be preferrably white
+\newcommand{\@otherpartnercompanylogo}{}
+\newcommand{\@otherpartnercompanylogowhite}{}
+\newcommand{\otherpartnercompanylogo}[2][]{%
+  \renewcommand{\@otherpartnercompanylogo}{#2}%
+  \ifthenelse{\equal{#1}{}}{\renewcommand{\@otherpartnercompanylogowhite}{#2}}{\renewcommand{\@otherpartnercompanylogowhite}{#1}}%
+}
 
-\newcommand{\@partnercompanylogoback}{\missingparam{partnercompanylogoback}}
-\newcommand{\partnercompanylogoback}[1]{\renewcommand{\@partnercompanylogoback}{#1}}
 
 % CHANGE Add thesis abstract for back cover and spik
 \newcommand{\@thesissummary}{\missingparam{thesissummary}}
@@ -168,23 +180,21 @@
 %% Options
 %%
 
-% Chapters and parts must start on a right-hand page request one.
-\newif\if@openright% FIXME necessary?
-\@openrighttrue
-
 \newif\if@mainmatter \@mainmattertrue% FIXME necessary?
 
 \newboolean{@isfinal}
+\setboolean{@isfinal}{false}
 \DeclareOption{final}{\setboolean{@isfinal}{true}}
 
 \newboolean{@isdraft}
+\setboolean{@isdraft}{false}
 \DeclareOption{draft}{\setboolean{@isdraft}{true}}
 
 % Boolean to check dissertation status, true if doctoral or licentiate thesis
 \newboolean{@isdissertation}
 \setboolean{@isdissertation}{false}
-\DeclareOption{dissertation}{\setboolean{@isdissertation}{true} \publicationtype{dissertation}}
-\DeclareOption{licentiate}{\setboolean{@isdissertation}{true} \publicationtype{licentiate}}
+\DeclareOption{dissertation}{\setboolean{@isdissertation}{true}\publicationtype{dissertation}}
+\DeclareOption{licentiate}{\setboolean{@isdissertation}{true}\publicationtype{licentiate}}
 
 \DeclareOption{researchproposal}{\publicationtype{researchproposal}}
 \DeclareOption{thesisproposal}{\publicationtype{thesisproposal}}
@@ -196,15 +206,6 @@
 \newboolean{@usecover}
 \DeclareOption{cover}{\setboolean{@usecover}{true}}
 \newcommand{\iscover}[2]{\ifthenelse{\boolean{@usecover}}{#1}{#2}}
-
-%% Ten, eleven, and twelve point size options
-\newcommand\@ptsize{0}% FIXME necessary?
-
-% For two-sided printing we use the switch \if@twoside.
-% In addition we have to set the \if@mparswitch to get
-% any margin paragraphs into the outside margin.
-\@twosidetrue
-\@mparswitchtrue
 
 % Pass language-specific options "english" and "swedish" to Babel
 \DeclareOption{english}{%
@@ -225,8 +226,8 @@
 %%
 
 % \ExecuteOptions{a4paper,twoside,topside,openright}
-\ProcessOptions
-\input{his-thesis10.clo}
+\ProcessOptions\relax
+\LoadClass[twoside,openright]{book}
 
 %%
 %% End of Execute Options
@@ -253,20 +254,14 @@
 \xdef\thepagecolornone{white}% this seeming redundant definition is sometimes necessary
 
 \PassOptionsToPackage{pdfpagelabels=false}{hyperref}
-%\PassOptionsToPackage{positioning,fit,calc}
-\RequirePackage{tikz}
-\pgfkeys{/pgf/images/include external/.code=\includegraphics{#1}}
 
-\isdraft{%
-    \usetikzlibrary{external}\tikzexternalize[prefix=tikz/,optimize command away=\includepdf]
-}{}
+\RequirePackage{tikz}
+%\PassOptionsToPackage{positioning,fit,calc}
 
 % Translations with babel
 \RequirePackage{babel}
 % For improved \RaggedLeft, \RaggedRight, and \Centering commands
 \RequirePackage{ragged2e}
-\RequirePackage[overload]{textcase}% FIXME necessary?
-
 %\RequirePackage{luaimageembed}
 
 %% Define page size and margins
@@ -304,16 +299,16 @@
 }
 %% Important: there are various \pdfpagewidth \pdfpageheight statements that
 %% change the paper size in mid-document
-\RequirePackage{luatex85}% required for \pdfpageheight and \pdfpagewidth
+%\RequirePackage{luatex85}% required for \pdfpageheight and \pdfpagewidth
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% hisbibliography
 %% Include packages for custom functionality
-\RequirePackage[backend=biber,datamodel=his-thesis,style=authoryear,natbib,maxbibnames=99,uniquename=false,uniquelist=false,useprefix=true]{biblatex} % CHANGED Added useprefix=true to handle prefixed names
+\RequirePackage[backend=biber,datamodel=his-thesis,style=authoryear,maxbibnames=99,uniquename=false,uniquelist=false,useprefix=true]{biblatex} % CHANGED Added useprefix=true to handle prefixed names
 
 \DeclareNameAlias{sortname}{family-given}
 
-\newbibmacro*{urn}{%\renewbibmacro*{urn}{
+\newbibmacro*{urn}{%
  \iffieldundef{urn}
  {}%
  {\adddot\space URN\addcolon\space\printfield{urn}}%
@@ -339,9 +334,9 @@
 
 % Some more nice reading on DeclareSourcemap for the Swedish context:
 %  http://blog.sigurdhsson.org/2014/04/extending-biblatex-chicago/
-\DeclareSourcemap{
-  \maps[datatype=bibtex]{
-    \map[overwrite=true]{
+\DeclareSourcemap{%
+  \maps[datatype=bibtex]{%
+    \map[overwrite=true]{%
         \pertype{phdthesis}
         % Any PhD thesises (including licentiate thesises) that are
         % part of the 'Dissertation Series' and have an URN
@@ -351,33 +346,34 @@
         % 'Dissertation Series, No. X' as well.
         %\step[fieldsource=series,match={Dissertation Series},final]
         %\step[fieldsource=urn,match=\regexp{^urn:nbn:se:his:},final]
-        \step[typesource=phdthesis,typetarget=histhesisnew] % CHANGED New format for dissertation series
+        \step[typesource=phdthesis, typetarget=histhesisnew] % CHANGED New format for dissertation series
         \step[fieldset=disstype, fieldvalue={Doctoral Dissertation}] % CHANGED Add disstype field
-        \step[fieldset=note,null] % CHANGED Remove note if present
+        \step[fieldset=note, null] % CHANGED Remove note if present
     }
     \map[overwrite=true]{ % CHANGED Added new mapping here
         % Change each licentiate dissertation to include the custom field value
         \pertype{misc}
+        \step[notfield=eprint, final] % Ignore preprints
         \step[typesource=misc, typetarget=histhesisnew] % CHANGED New format for dissertation series
         \step[fieldset=disstype, fieldvalue={Licentiate Dissertation}] % CHANGED Add disstype field
-        \step[fieldset=note,null] % CHANGED Remove note if present
+        \step[fieldset=note, null] % CHANGED Remove note if present
     }
-    \map{
+    \map{%
       % Remove 'url' field from entries that have a DOI defined
       \step[fieldsource=doi,final]
       \step[fieldset=url,null]
     }
-    \map{
+    \map{%
       % Remove 'url' field from entries that have an ISSN defined
       \step[fieldsource=issn,final]
       \step[fieldset=url,null]
     }
-    \map{
+    \map{%
       % Remove 'url' field from entries that have an ISBN defined
       \step[fieldsource=isbn,final]
       \step[fieldset=url,null]
     }
-    \map{
+    \map{%
       % Remove 'url' field from entries that have an URN defined
       \step[fieldsource=urn,final]
       \step[fieldset=url,null]
@@ -388,7 +384,7 @@
     %   \step[fieldset=sortkey, origfieldval]
     % }
     % CHANGED Added sorting to correctly sort entries using prefixes, such as van der Zee or von Beethoven
-    \map[overwrite=true]{
+    \map[overwrite=true]{%
       \step[fieldsource=translator]
       \step[fieldset=tempsortname, origfieldval]
       \step[fieldsource=editor]
@@ -396,27 +392,27 @@
       \step[fieldsource=author]
       \step[fieldset=tempsortname, origfieldval]
     }
-    \map[overwrite=true]{
+    \map[overwrite=true]{%
       \step[fieldsource=tempsortname, match=\regexp{(^|\s+)\Kv[a|o]n\s+(der\s+)?}, replace={$1}]
     }
-    \map[overwrite=false]{
+    \map[overwrite=false]{%
       \step[fieldsource=tempsortname]
       \step[fieldset=sortname, origfieldval]
     }
-    \map[overwrite=true]{
+    \map[overwrite=true]{%
       \step[fieldset=month,null]
     }
   }
 }
 
-\DeclareSortingTemplate{seriesnumber}{ % CHANGED DeclareSortingScheme is deprecated
-  \sort{
+\DeclareSortingTemplate{seriesnumber}{% CHANGED DeclareSortingScheme is deprecated
+  \sort{%
     \field{presort}
   }
-  \sort[final]{
+  \sort[final]{%
     \field{sortkey}
   }
-  \sort[direction=ascending]{
+  \sort[direction=ascending]{%
     \field[padside=left,padwidth=3,padchar=0,]{number}
     \literal{999}
     \field{author}
@@ -434,10 +430,9 @@
 % label which has to equal 'dissertation-series'.
 % All publications in this bibliography will be
 % printed, no \cite or \nocite command is necessary.
-\isdissertation{
+\isdissertation{%
   \addbibresource[label=dissertation-series]{dissertation-series.bib}
-}{
-}
+}{}
 
 
 % The following hyphenation command will take care of
@@ -457,58 +452,59 @@
 %% in the same series. The list of dissertations is
 %% determined by the references labeled 'dissertation-series'
 \newcommand\dissertationlist{%
-\part*{Publications in the Dissertation Series}% List of references is an unnumbered Part
-\phantomsection % CHANGE Fixing hyperref linking
-\addcontentsline{toc}{part}{\protect\texorpdfstring{\uppercase{Publications in the Dissertation Series}}{Publications in the Dissertation Series}}% manually add this unnumbered Part to ToC (not automatically as it is the star'ed version)
-%\markboth{}{\uppercase{Publications in the Dissertation Series}}% fix headings (odd pages 'Publications in the Dissertation Series', even pages empty)
-\chapter*{Publications in the Dissertation~Series} % CHANGE New chapter title
-\renewcommand{\leftmark}{PUBLICATIONS} % CHANGE New heading on these pages
-\begingroup
-\DeclareFieldFormat{title}{##1} % CHANGE Regular title
-\DeclareFieldFormat{isbn}{\mkbibacro{ISBN}\space ##1} % CHANGE Remove colon after ISBN
-\defbibheading{subbibliography}{%
-% No title, purple-colored page right before bibliography
-}
-\begin{refsection}[dissertation-series]
-    \begin{refcontext}[sorting=seriesnumber]
-        \tolerance=1
-        \emergencystretch=\maxdimen
-        \hyphenpenalty=10000
-        \hbadness=10000
-        \defbibenvironment{bibliography} % CHANGE Enumerated publications in the dissertation-series
-            {\begin{enumerate}}
-            {\end{enumerate}}
-            {\item}
-        \nocite{*}
-        \printbibliography[heading=subbibliography]
-    \end{refcontext}
-\end{refsection}
-\endgroup
-\isdissertation{\cleardoublepage}{\clearpage}
+    \part*{Publications in the Dissertation~Series}% List of references is an unnumbered Part
+    \phantomsection % CHANGE Fixing hyperref linking
+    \chapter*{Publications in the Dissertation~Series} % CHANGE New chapter title
+    \renewcommand{\leftmark}{PUBLICATIONS} % CHANGE New heading on these pages
+    \addcontentsline{toc}{part}{\protect\texorpdfstring{\uppercase{Publications in the Dissertation Series}}{Publications in the Dissertation Series}}% manually add this unnumbered Part to ToC (not automatically as it is the star'ed version)
+    %\markboth{}{\uppercase{Publications in the Dissertation Series}}% fix headings (odd pages 'Publications in the Dissertation Series', even pages empty)
+    \begingroup
+    \DeclareFieldFormat{title}{##1} % CHANGE Regular title
+    \DeclareFieldFormat{isbn}{\mkbibacro{ISBN}\space ##1} % CHANGE Remove colon after ISBN
+    \defbibheading{subbibliography}{%
+    % No title, purple-colored page right before bibliography
+    }
+    \begin{refsection}[dissertation-series]
+        \begin{refcontext}[sorting=seriesnumber]
+            \tolerance=1
+            \emergencystretch=\maxdimen
+            \hyphenpenalty=10000
+            \hbadness=10000
+            %\setlist[enumerate]{}
+            \defbibenvironment{bibliography} % CHANGE Enumerated publications in the dissertation-series
+                {\begin{enumerate}}%[left=5pt, labelwidth=1pt, itemsep=2pt]}
+                {\end{enumerate}}
+                {\item}
+            \nocite{*}
+            \printbibliography[heading=subbibliography]
+        \end{refcontext}
+    \end{refsection}
+    \endgroup
+    \isdissertation{\cleardoublepage}{\clearpage}
 }%
 
 %% List of References as cited by the dissertation
 %% author in his/her report. Essentially a nice
 %% wrapper around \printbibliography.
 \newcommand{\listofreferences}{%
-	\isdissertation
-	{\part*{\refname}}% List of references is an unnumbered Part if dissertation or licentiate
-	{\clearpage}% fix headings (odd pages 'References', even pages empty)
+    \part*{\refname}
     \phantomsection % CHANGE Fixing hyperref linking
+    
 	\chapter*{\MakeUppercase{\refname}} % CHANGE Also chapter
 	\renewcommand{\leftmark}{\MakeUppercase{\refname}} % CHANGE TO UPDATE CHAPTER HEADING FOR STAR CHAPTER
 	\addcontentsline{toc}{part}{\protect\texorpdfstring{\MakeUppercase{\refname}}{References}}% manually add this unnumbered Part to ToC (not automatically as it is the star'ed version)
 	\markboth{}{\uppercase{\refname}}
+ 
 	\begingroup%
 	\defbibheading{subbibliography}{%
 	% No title, purple-colored page (generated by \part*) right before bibliography
 	}
 	\begin{refcontext}[sorting=nyt]
-	\tolerance=1
-	\emergencystretch=\maxdimen
-	\hyphenpenalty=10000
-	\hbadness=10000
-	\printbibliography[heading=subbibliography]
+    	\tolerance=1
+    	\emergencystretch=\maxdimen
+    	\hyphenpenalty=10000
+    	\hbadness=10000
+    	\printbibliography[heading=subbibliography]
 	\end{refcontext}
 	\endgroup
 }% end of \listofreferences
@@ -551,43 +547,43 @@
 %% Based on
 %% http://tex.stackexchange.com/questions/28294/can-i-have-the-overfullrule-rule-colored-in-pdflatex
 %% https://github.com/raphink/overcolored
-\ifluatex
-\RequirePackage{luatexbase,luacode}
-\begin{luacode}
+% \ifluatex
+% \RequirePackage{luatexbase,luacode}
+% \begin{luacode}
 
-orangebox = function(head)
-  while head do
-    if head.id == 0 or head.id == 1 then
-      -- go through the hlists (the rows)
-      orangebox(head.head)
+% orangebox = function(head)
+%   while head do
+%     if head.id == 0 or head.id == 1 then
+%       -- go through the hlists (the rows)
+%       orangebox(head.head)
 
-    -- if there's a rule after the rightskip, this is the overfull box
-    -- node id 10 == glue, glue subtype 9 is rightskip, node id 2 is a rule
+%     -- if there's a rule after the rightskip, this is the overfull box
+%     -- node id 10 == glue, glue subtype 9 is rightskip, node id 2 is a rule
 
-    elseif head.id == 10 and head.subtype == 9 and head.next and head.next.id == 2 then
-       -- this must be an overfull box
-       local w1, w2
-       w1 = node.new("whatsit","pdf_literal")
-       w1.data = "q 1 0.6667 0.3333 rg"
-       w1.mode = 1
-       w2 = node.new("whatsit","pdf_literal")
-       w2.data = " Q"
-       w2.mode = 1
+%     elseif head.id == 10 and head.subtype == 9 and head.next and head.next.id == 2 then
+%        -- this must be an overfull box
+%        local w1, w2
+%        w1 = node.new("whatsit","pdf_literal")
+%        w1.data = "q 1 0.6667 0.3333 rg"
+%        w1.mode = 1
+%        w2 = node.new("whatsit","pdf_literal")
+%        w2.data = " Q"
+%        w2.mode = 1
 
-       w1.next = head.next -- the rule
-       head.next = w1      -- color start
-       w1.next.next = w2   -- color end
+%        w1.next = head.next -- the rule
+%        head.next = w1      -- color start
+%        w1.next.next = w2   -- color end
 
-       node.slide(head)    -- adjust prev pointers
-    end
-    head = head.next
-  end
-  return true
-end
-luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
+%        node.slide(head)    -- adjust prev pointers
+%     end
+%     head = head.next
+%   end
+%   return true
+% end
+% luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
-\end{luacode}
-\fi
+% \end{luacode}
+% \fi
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -617,9 +613,9 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \DeclareBibliographyCategory{ownpublicationslowrelevance}
 \DeclareBibliographyCategory{ownpublications}
 
-\isdraft{
+\isdraft{%
     \newenvironment{ownpublications}{}{}
-}{
+}{%
     \newenvironment{ownpublications}{%
         \isdissertation{\cleardoublepage}{\clearpage}
         \pdfbookmark[section]{Publications}{publications} % CHANGE To include an entry in the bookmarks section of the PDF
@@ -635,39 +631,39 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 
 \newcommand{\highrelevancepublications}[1]{%
-\isdraft{}{
-    \begin{refcontext}[sorting=none]
-    \addtocategory{ownpublicationshighrelevance}{#1}\nocite{#1}
-    \printbibliography[heading=subbibliography,title=Publications with High Relevance,env=ownpublicationsbibenvironment,category=ownpublicationshighrelevance]
-    \end{refcontext}
-}
+    \isdraft{}{%
+        \begin{refcontext}[sorting=none]
+        \addtocategory{ownpublicationshighrelevance}{#1}\nocite{#1}
+        \printbibliography[heading=subbibliography,title=Publications with High Relevance,env=ownpublicationsbibenvironment,category=ownpublicationshighrelevance]
+        \end{refcontext}
+    }
 }
 
 \newcommand{\lowrelevancepublications}[1]{%
-\isdraft{}{
-    \begin{refcontext}[sorting=none]
-    \addtocategory{ownpublicationslowrelevance}{#1}\nocite{#1}
-    \printbibliography[heading=subbibliography,title=Publications with Low Relevance,env=ownpublicationsbibenvironment,category=ownpublicationslowrelevance]
-    \end{refcontext}
-}
+    \isdraft{}{%
+        \begin{refcontext}[sorting=none]
+        \addtocategory{ownpublicationslowrelevance}{#1}\nocite{#1}
+        \printbibliography[heading=subbibliography,title=Publications with Low Relevance,env=ownpublicationsbibenvironment,category=ownpublicationslowrelevance]
+        \end{refcontext}
+    }
 }
 
 \newcommand{\authorspublications}[1]{%
-\isdraft{}{
-    \begin{refcontext}[sorting=none]
-    \addtocategory{ownpublications}{#1}\nocite{#1}
-    \printbibliography[heading=none,env=ownpublicationsbibenvironment,category=ownpublications]
-    \end{refcontext}
-}
+    \isdraft{}{%
+        \begin{refcontext}[sorting=none]
+        \addtocategory{ownpublications}{#1}\nocite{#1}
+        \printbibliography[heading=none,env=ownpublicationsbibenvironment,category=ownpublications]
+        \end{refcontext}
+    }
 }
 
 \newcommand{\authorspublication}[2][]{%
-\isdraft{}{
-    \stepcounter{ownpublicationsenumi}%
-    \subsection*{Paper \Roman{ownpublicationsenumi}}%
-    \fullcite{#2}%
-    \ifthenelse{\equal{#1}{}}{}{\par\textit{Author's contribution}: #1}% print optional author's contributions
-}
+    \isdraft{}{%
+        \stepcounter{ownpublicationsenumi}%
+        \subsection*{Paper \Roman{ownpublicationsenumi}}%
+        \fullcite{#2}%
+        \ifthenelse{\equal{#1}{}}{}{\par\textit{Author's contribution}: #1}% print optional author's contributions
+    }
 }
 
 % Retrieving a publication's title, without quotation marks or any other 'candy'.
@@ -685,37 +681,46 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 % Third optional argument is the suffix to the full citation. #3
 % First mandatory argument is a path to the pdf file. #4
 % Second mandatory argument is the reference code to the article. #5
-\NewDocumentCommand \fullarticle {O{scale=.85,clip=true,pages=-} O{} O{} m m }{%
-	\stepcounter{ownpublicationsenumi}
-	\isdissertation{\cleardoublepage}{\clearpage}
-	\phantomsection
-	\addcontentsline{toc}{section}{\texorpdfstring{Paper~\Roman{ownpublicationsenumi}: \citetitleverbatim{#4}}{Paper~\Roman{ownpublicationsenumi}}}% CHANGE added texorpdfstring to fix hyperref linking. % section-like line in ToC, but does not appear in main text body
-	\IfNoValueTF {#2}%
-		{ \IfNoValueTF {#3}% No value for #2, then check #3.
-			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}}
-			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[\fullcite{#4} #3]}
-		}%
-		{ \IfNoValueTF {#3}% Value for #2, then check #3.
-			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[\fullcite{#4} #3]}
-			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[#2 \fullcite{#4} #3]}
-		}% nice purple page with article's title, like special page for parts, but does not appear in ToC and does not try to make it uppercase
+\isdraft{%
+    \NewDocumentCommand \fullarticle {O{scale=.85,clip=true,pages=-} O{} O{} m m }{}
+    }{%
+    \NewDocumentCommand \fullarticle {O{scale=.85,clip=true,pages=-} O{} O{} m m }{%
+    	\stepcounter{ownpublicationsenumi}
+    	\isdissertation{\cleardoublepage}{\clearpage}
+    	\phantomsection
+    	\addcontentsline{toc}{section}{\texorpdfstring{Paper~\Roman{ownpublicationsenumi}: \citetitleverbatim{#4}}{Paper~\Roman{ownpublicationsenumi}}}% CHANGE added texorpdfstring to fix hyperref linking. % section-like line in ToC, but does not appear in main text body
+    	\IfNoValueTF {#2}%
+    		{ \IfNoValueTF {#3}% No value for #2, then check #3.
+    			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}}
+    			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[\fullcite{#4} #3]}
+    		}%
+    		{ \IfNoValueTF {#3}% Value for #2, then check #3.
+    			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[\fullcite{#4} #3]}
+    			{\partlike[\MakeUppercase{Paper~\Roman{ownpublicationsenumi}}]{\citetitleuppercase{#4}}[#2 \fullcite{#4} #3]}
+    		}% nice purple page with article's title, like special page for parts, but does not appear in ToC and does not try to make it uppercase
+    
+    	\ifthenelse{\boolean{@isfinal}}{%
+    		  \newgeometry{margin=0cm}%
+    		  \includepdf[#1,noautoscale,clip=true]{#5}% include article's PDF, but scale it to fit the smaller pages' size
+    		  \restoregeometry%
+    	}{%
+    		  \includepdf[#1,frame=true]{#5}% include article's PDF, but keep author's scaling intact
+    	}
+    }%
+}
 
-	\ifthenelse{\boolean{@isfinal}}{%
-		\newgeometry{margin=0cm}%
-		\includepdf[#1,noautoscale,clip=true]{#5}% include article's PDF, but scale it to fit the smaller pages' size
-		\restoregeometry%
-	}{%
-		\includepdf[#1,frame=true]{#5}% include article's PDF, but keep author's scaling intact
-	}
-}%
-\newenvironment{fullarticles}[1][Previously Published Articles]{%
-	\markboth{}{}% no page header
-	\isdissertation{\cleardoublepage}{\clearpage}
-	\phantomsection
-	\part*{Previously Published Articles}
-	\addcontentsline{toc}{part}{\texorpdfstring{\MakeUppercase{#1}}{#1}}% part-like line in ToC, but does not appear in main text body
+\isdraft{%
+    \newenvironment{fullarticles}{}{}
 }{%
-	\isdissertation{\cleardoublepage}{\clearpage}
+    \newenvironment{fullarticles}[1][Previously Published Articles]{%
+       \markboth{}{}% no page header
+       \isdissertation{\cleardoublepage}{\clearpage}
+       \phantomsection
+       \part*{Previously Published Articles}
+       \addcontentsline{toc}{part}{\texorpdfstring{\MakeUppercase{#1}}{#1}}% part-like line in ToC, but does not appear in main text body
+    }{%
+        \isdissertation{\cleardoublepage}{\clearpage}
+    }
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -888,38 +893,44 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 }%
 
 % CHANGE Redefine cleardoublepage to not have footers on the empty page
-\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
-\hbox{}
-\vspace*{\fill}
-\vspace{\fill}
-\thispagestyle{empty}
-\newpage
-\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\def\cleardoublepage{%
+    \clearpage%
+    \ifodd\c@page%
+        % do nothing
+    \else%
+        \emptypage@emptypage%
+    \fi
+}   
+
+\def\emptypage@emptypage{%
+    \hbox{}%
+    \thispagestyle{empty}   %% or any page style
+    %\vspace*{\fill}
+    %\begin{center}
+    %    This page is created from cleardoublepage \\ Counter: \thepage \\ Mypagecount: \arabic{mypagecount}
+    %\end{center}
+    %\vspace{\fill}
+    \newpage%
+}%
 
 \setcounter{secnumdepth}{2}
-\newcounter {part}
-\newcounter {chapter}
-\newcounter {section}[chapter]
-\newcounter {subsection}[section]
-\newcounter {subsubsection}[subsection]
-\newcounter {paragraph}[subsubsection]
-\renewcommand \thepart {\@Roman\c@part}
-\renewcommand \thechapter {\@arabic\c@chapter}
-\renewcommand \thesection {\thechapter.\@arabic\c@section}
-\renewcommand\thesubsection   {\thesection.\@arabic\c@subsection}
-\renewcommand\thesubsubsection{\thesubsection .\@arabic\c@subsubsection}
-\renewcommand\theparagraph    {\thesubsubsection.\@arabic\c@paragraph}
-\newcommand\@chapapp{\chaptername}
-\newcommand\frontmatter{%
-    \cleardoublepage
+\renewcommand \thepart          {\@Roman\c@part}
+\renewcommand \thechapter       {\@arabic\c@chapter}
+\renewcommand \thesection       {\thechapter.\@arabic\c@section}
+\renewcommand \thesubsection    {\thesection.\@arabic\c@subsection}
+\renewcommand \thesubsubsection {\thesubsection.\@arabic\c@subsubsection}
+\renewcommand \theparagraph     {\thesubsubsection.\@arabic\c@paragraph}
+%\newcommand\@chapapp{\chaptername}
+\renewcommand\frontmatter{%
+  \isdissertation{\cleardoublepage}{\clearpage}
   \@mainmatterfalse
   \pagenumbering{roman}}
-\newcommand\mainmatter{%
-    \cleardoublepage
+\renewcommand\mainmatter{%
+  \isdissertation{\cleardoublepage}{\clearpage}
   \@mainmattertrue
   \pagenumbering{arabic}}
-\newcommand\backmatter{%
-  \cleardoublepage
+\renewcommand\backmatter{%
+  \isdissertation{\cleardoublepage}{\clearpage}
   \@mainmatterfalse}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -942,8 +953,8 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
   \@endpart%
 }
 
-\newcommand\part{%
-  \secdef\@part\@spart}% for part*, use @spart, for non-star part use @part
+\renewcommand\part{%
+    \secdef\@part\@spart}% for part*, use @spart, for non-star part use @part
 
 \def\@part[#1]#2{%
     \@beginpart
@@ -975,27 +986,18 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 %% The actual formatting of the beginning of the part (both star and non-star forms)
 \isdraft{%
-    \def\@beginpart{
-        \setcounter{mypagecount}{\value{page}}
+    \def\@beginpart{%
         \clearpage
+        \setcounter{mypagecount}{\value{page}}
         \markboth{}{}% no page header
         \thispagestyle{empty}% no page numbers on just this page
         \vspace*{44mm}% CHANGE Should be 70mm from top of paper
         }
 }{%
     \def\@beginpart{%
-        \setcounter{mypagecount}{\value{page}} % CHANGED Do not count PART pages
         \isdissertation{\cleardoublepage}{\clearpage}
-        \isdissertation{%
-            \isfinal{%
-                \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
-            }{%
-    		  % In non-final mode, i.e. when printing on A4, do not change paper size
-            }
-        }{%
-        }
-        
-        \null%\vfill
+        \setcounter{mypagecount}{\value{page}} % CHANGED Do not count PART pages
+        %\null\vfil
         % Define a dark purple color used for page backgrounds
         \newpagecolor{specialpagebackground}%
         \markboth{}{}% no page header
@@ -1010,20 +1012,22 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     \def\@endpart{\setcounter{page}{\value{mypagecount}}}
 }{%
     \def\@endpart{%
-        \vfill
-        \isdissertation{\newpage}{}%
-        \null%
-        \thispagestyle{empty}%
-        \isdissertation{%
-        		\isfinal{%
-        		  \eject \pdfpagewidth 168mm \pdfpageheight 240mm% Set paper size to 168mm x 240mm
-        		}{%
-        		  % In non-final mode, i.e. when printing on A4, do not change paper size
-        		}
-        }{}%
-        \isdissertation{\newpage}{\clearpage}%
-        \setcounter{page}{\value{mypagecount}} % CHANGED Do not count PART pages
+        \isdissertation{\clearpage}{}%
+        \hbox{}%
+        \thispagestyle{empty}   %% or any page style
+        %\vspace*{\fill}
+        
+        %\begin{center}
+        %    This page is created from @endpart \\ Counter: \thepage \\ Mypagecount: \arabic{mypagecount}
+        %\end{center}
+        %\vspace{\fill}
+        %\addtocounter{mypagecount}{1}
+        \newpage%
+        %\isdissertation{\cleardoublepage}{\clearpage}%
+        
+        
         \restorepagecolor% restore original page color
+        \setcounter{page}{\value{mypagecount}} % CHANGED Do not count PART pages
     }
 }
 
@@ -1036,19 +1040,19 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %% Chapters
 %%
 
-\newcommand\chapter{\isdraft{\clearpage}{\isdissertation{\cleardoublepage}{\clearpage}}% chapter shall start on a fresh right page if dissertation
+\renewcommand\chapter{\isdraft{\clearpage}{\isdissertation{\cleardoublepage}{\clearpage}}% chapter shall start on a fresh odd page if dissertation
                     \thispagestyle{footeronly} % CHANGE No heading on first page of chapter
-                    \global\@topnum\z@% ???
-                    \@afterindentfalse% ???
+                    \global\@topnum\z@% From book.cls
+                    \@afterindentfalse% From book.cls
                     \secdef\@chapter\@schapter}% for chapter*, use @schapter, for non-star chapter use @chapter
-\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne% ???
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne% From book.cls
                        \if@mainmatter% if in main text body (i.e. not ToC, LoC, LoF, ...)
                          %\isdissertation{}{\ifthenelse{\value{chapter}<1}{\pdfbookmark[chapter]{\@publicationtypelong}{proposal} % CHANGE To include an entry in the bookmarks section of the PDF
                          %\part*{\@publicationtypelong}}{}}
                          \refstepcounter{chapter}% increase chapter counter
                          %\typeout{\@chapapp\space\thechapter.}% debug output in console
                          \renewcommand{\leftmark}{\chaptername~\thechapter~#1}
-                         \addcontentsline{toc}{chapter}{\protect\numberline{\thechapter.}\texorpdfstring{\MakeUppercase{#1}}{#1}}% will appear in ToC CHANGED dot after number
+                         \addcontentsline{toc}{chapter}{\protect\numberline{\thechapter.}\texorpdfstring{\protect\MakeUppercase{#1}}{#1}}% will appear in ToC CHANGED dot after number
                        \else
                          \addcontentsline{toc}{chapter}{\texorpdfstring{\MakeUppercase{#1}}{#1}}% chapters in frontmatter or backmatter, will appear in ToC
                        \fi
@@ -1066,10 +1070,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
   {\parindent \z@ \raggedright
     \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter% if in main text body (i.e. not ToC, LoC, LoF, ...)
-        \isdissertation{
+        \isdissertation{%
             \fontarial{13.5}{15}
             \addfontfeature{LetterSpace=7.5}% LetterSpace: 1pt / 13.5pt * 100 = 7.4
-        }{
+        }{%
             \fontarial{15}{16.5}
             \addfontfeature{LetterSpace=7.5}% LetterSpace: 1pt / 15pt * 100 = 6.7
         }
@@ -1079,10 +1083,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
       \fi
     \fi
     \interlinepenalty\@M
-    \isdissertation{
+    \isdissertation{%
         \fontarial{16.5}{18}
         \addfontfeature{LetterSpace=7.5}% LetterSpace: 1.5pt / 16.5pt * 100 = 9.1
-    }{
+    }{%
         \fontarial{18}{19.5}
         \addfontfeature{LetterSpace=7.5}% LetterSpace: 1.5pt / 18pt * 100 = 8.3
     }
@@ -1096,10 +1100,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
   \vspace*{44mm}% CHANGE 70 mm from top of page, margin is 21 mm. Add some vertical space between top of page and where text "This Is The Chapter Title" starts
   {\parindent \z@ \raggedright
     \interlinepenalty\@M
-    \isdissertation{
+    \isdissertation{%
         \fontarial{16.5}{18}
         \addfontfeature{LetterSpace=7.5}% LetterSpace: 1.5pt / 16.5pt * 100 = 9.1
-    }{
+    }{%
         \fontarial{18}{19.5}
         \addfontfeature{LetterSpace=7.5}% LetterSpace: 1.5pt / 18pt * 100 = 8.3
     }
@@ -1135,7 +1139,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 %% First level heading (swedish: underrubrik 1)
 %% LetterSpace: 1pt / 13.5pt * 100 = 7.4
-\newcommand\section{\@startsection{section}{1}{\z@}%
+\renewcommand\section{\@startsection{section}{1}{\z@}%
                                   {-18pt \@plus -4pt \@minus -2pt}%
                                   {2.8pt \@plus 2pt}%
                                   {\isdissertation{%
@@ -1143,9 +1147,22 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
                                    }{%
                                     \fontarial{15}{16.5}\addfontfeature{LetterSpace=7.5}\MakeUppercase}}}
 
+\let\oldsection\section
+\RenewDocumentCommand{\section}{s o m}{%
+  \renewcommand{\secname}{#3}% Store \section name in \secname
+  \IfBooleanTF{#1}
+    {\oldsection*{#3}}% \section*{..}
+    {\IfValueTF{#2}
+       {\oldsection[#2]{#3}}% \section[.]{..}
+       {\oldsection{#3}}% \section{..}
+    }%
+}
+
+\newcommand{\secname}{}% Define first \secname
+
 %% Second level heading (swedish: underrubrik 2)
 %% LetterSpace: 0.5pt / 10.5pt * 100 = 4.8
-\newcommand\subsection{\@startsection{subsection}{2}{\z@}%
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
                                      {-18pt \@plus -4pt \@minus -2pt}%
                                      {2.8pt \@plus 2pt}%
                                      {\isdissertation{%
@@ -1154,7 +1171,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
                                      \fontarial{12}{13.5}\addfontfeature{LetterSpace=5}\MakeUppercase}}}
 
 %% Third level heading (swedish: unterrubrik 3)
-\newcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
                                      {-5pt \@plus -2pt \@minus -.5pt}%
                                      {0.1pt}%
                                      {\isdissertation{%
@@ -1163,7 +1180,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
                                         \fontarial{11}{12.5}}}}
 
 %% Fourth level heading: like third-level heading, but inline
-\newcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
                                     {-5pt \@plus -2pt \@minus -.5pt}%
                                     {-1em}%
                                     {\isdissertation{%
@@ -1225,34 +1242,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \@beginparpenalty -\@lowpenalty
 \@endparpenalty -\@lowpenalty
 \@itempenalty -\@lowpenalty
-\renewcommand\theenumi{\@arabic\c@enumi}
-\renewcommand\theenumii{\@alph\c@enumii}
-\renewcommand\theenumiii{\@roman\c@enumiii}
-\renewcommand\theenumiv{\@Alph\c@enumiv}
-\newcommand\labelenumi{\theenumi.}
-\newcommand\labelenumii{\theenumii}
-\newcommand\labelenumiii{\theenumiii.}
-\newcommand\labelenumiv{\theenumiv.}
-\renewcommand\p@enumii{\theenumi}
-\renewcommand\p@enumiii{\theenumi(\theenumii)}
-\renewcommand\p@enumiv{\p@enumiii\theenumiii}
-\newcommand\labelitemi{\textbullet}
-\newcommand\labelitemii{\normalfont\bfseries \textendash}
-\newcommand\labelitemiii{\textasteriskcentered}
-\newcommand\labelitemiv{\textperiodcentered}
-
-%\setlength  \labelsep  {.5em}
-%\setlength  \labelwidth{\leftmargini}
-%\addtolength\labelwidth{-\labelsep}
-%\@beginparpenalty -\@lowpenalty
-%\@endparpenalty   -\@lowpenalty
-%\@itempenalty     -\@lowpenalty
 %\renewcommand\theenumi{\@arabic\c@enumi}
 %\renewcommand\theenumii{\@alph\c@enumii}
 %\renewcommand\theenumiii{\@roman\c@enumiii}
 %\renewcommand\theenumiv{\@Alph\c@enumiv}
 %\newcommand\labelenumi{\theenumi.}
-%\newcommand\labelenumii{(\theenumii)}
+%\newcommand\labelenumii{\theenumii}
 %\newcommand\labelenumiii{\theenumiii.}
 %\newcommand\labelenumiv{\theenumiv.}
 %\renewcommand\p@enumii{\theenumi}
@@ -1273,15 +1268,15 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %%
 
 %% Description environment
-\newenvironment{description}
+\renewenvironment{description}
                {\list{}{\labelwidth\z@ \itemindent-\leftmargin
                         \let\makelabel\descriptionlabel}}
                {\endlist}
-\newcommand*\descriptionlabel[1]{\hspace\labelsep
+\renewcommand*\descriptionlabel[1]{\hspace\labelsep
                                 \normalfont\bfseries #1}
 
 %% Quote environment
-\newenvironment{quote}{%
+\renewenvironment{quote}{%
 	\par%
 	\smaller%
 	\begingroup%
@@ -1293,7 +1288,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 }
 
 %% Appendix environment
-\newcommand\appendix{\par
+\renewcommand\appendix{\par
   \setcounter{chapter}{0}%
   \setcounter{section}{0}%
   \gdef\@chapapp{\appendixname}%
@@ -1347,7 +1342,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %%
 
 %% Figure counter
-\newcounter{figure}[chapter]
+%\newcounter{figure}[chapter]
 \renewcommand \thefigure
      {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@figure}
 
@@ -1355,15 +1350,17 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \def\fps@figure{tbp}
 \def\ftype@figure{1}
 \def\ext@figure{lof}
+
+%% Generate number for caption
 \def\fnum@figure{\figurename\nobreakspace\thefigure}
 
 %% Single and double column figures respectively
-\newenvironment{figure}
-               {\@float{figure}}
-               {\end@float}
-\newenvironment{figure*}
-               {\@dblfloat{figure}}
-               {\end@dblfloat}
+%\newenvironment{figure}
+%               {\@float{figure}}
+%               {\end@float}
+%\newenvironment{figure*}
+%               {\@dblfloat{figure}}
+%               {\end@dblfloat}
 
 %%
 %% End of Figures
@@ -1375,7 +1372,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %%
 
 %% Table counter
-\newcounter{table}[chapter]
+%\newcounter{table}[chapter]
 \renewcommand \thetable
      {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@table}
 
@@ -1388,12 +1385,12 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \def\fnum@table{\tablename\nobreakspace\thetable}
 
 %% Single and double column tables respectively
-\newenvironment{table}
-               {\@float{table}}
-               {\end@float}
-\newenvironment{table*}
-               {\@dblfloat{table}}
-               {\end@dblfloat}
+%\newenvironment{table}
+%               {\@float{table}}
+%               {\end@float}
+%\newenvironment{table*}
+%               {\@dblfloat{table}}
+%               {\end@dblfloat}
 
 %%
 %% End of Tables
@@ -1405,8 +1402,8 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %%
 
 %% White space above and below caption
-\newlength\abovecaptionskip
-\newlength\belowcaptionskip
+%\newlength\abovecaptionskip
+%\newlength\belowcaptionskip
 \setlength\abovecaptionskip{10\p@}
 \setlength\belowcaptionskip{0\p@}
 
@@ -1457,6 +1454,8 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \setmainfont{Georgia}
 \setsansfont{Arial}
 
+%\renewcommand{\familydefault}{\sfdefault}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Commands to switch btwn serif/sans-serif and to set font size
 \newcommand{\fontarial}[2]{%
@@ -1468,6 +1467,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\fontsize{#1}{#2}%
 	\selectfont%
 	\rmfamily%
+}
+
+\newcommand{\setfontsizeandtype}{%
+    \isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}
 }
 
 
@@ -1533,16 +1536,16 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \setcounter{tocdepth}{2}
 
 %% Width of page numbers
-\newcommand\@pnumwidth{1.55em}
+\renewcommand\@pnumwidth{1.55em}
 
 %% Width of right margin
-\newcommand\@tocrmarg{0em}	% Flush right
+%\newcommand\@tocrmarg{0em}	% Flush right
 
 %% Separation of dots (in mu units)
-\newcommand\@dotsep{1.0}
+%\newcommand\@dotsep{1.0}
 
 %% Produce table of contents
-\newcommand\tableofcontents{%
+\renewcommand\tableofcontents{%
     \cleardoublepage
     \pdfbookmark[section]{\contentsname}{toc} % CHANGE To include an entry in the bookmarks section of the PDF
     \chapter*{\MakeUppercase{\contentsname}% manual make-uppercase necessary, automatic upper-casing inside \chapter* does not work(?)
@@ -1554,7 +1557,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 %% Format part entries in toc
 %% Called with \numberline{<\thepart>}{<heading>} and <page>
-\newcommand*\l@part[2]{%
+\renewcommand*\l@part[2]{%
   \ifnum \c@tocdepth >-2\relax
     \addpenalty{-\@highpenalty}%
     \addvspace{2.25em \@plus\p@}%	% Add some vertical space
@@ -1574,7 +1577,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
   \fi}
 
 %% Called with \numberline{<\thechapter>}{<heading>} and <page>
-\newcommand*\l@chapter[2]{%
+\renewcommand*\l@chapter[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
     %\vskip 1.0em \@plus\p@ % CHANGED
@@ -1594,14 +1597,14 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %% Format section entries in toc
 %% Use definitions in latex.ltx
 %% Called with \numberline{<\thesection>}{<heading>} and <page>
-\newcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
-\newcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
-\newcommand*\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
-\newcommand*\l@paragraph{\@dottedtocline{4}{10em}{5em}}
-\newcommand*\l@subparagraph{\@dottedtocline{5}{10em}{5em}}
+%\newcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+%\newcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+%\newcommand*\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
+%\newcommand*\l@paragraph{\@dottedtocline{4}{10em}{5em}}
+%\newcommand*\l@subparagraph{\@dottedtocline{5}{10em}{5em}}
 
 %% Produce list of figures
-\newcommand\listoffigures{%
+\renewcommand\listoffigures{%
     \isdissertation{\cleardoublepage}{\clearpage}
     \pdfbookmark[section]{\listfigurename}{lof} % CHANGE To include an entry in the bookmarks section of the PDF
     \chapter*{\MakeUppercase{\listfigurename}}% manual make-uppercase necessary, automatic upper-casing inside \chapter* does not work(?)
@@ -1611,10 +1614,10 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     }
 
 %% Format figure entries in lof
-\newcommand*\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
+%\newcommand*\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
 
 %% Produce list of tables
-\newcommand\listoftables{%
+\renewcommand\listoftables{%
     \isdissertation{\cleardoublepage}{\clearpage}
     \pdfbookmark[section]{\listtablename}{lot} % CHANGE To include an entry in the bookmarks section of the PDF
     \chapter*{\MakeUppercase{\listtablename}}% manual make-uppercase necessary, automatic upper-casing inside \chapter* does not work(?)
@@ -1623,7 +1626,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     \@starttoc{lot}%		% Make the actual lot
     }
 
-%% Produce entry in lot
+%% Produce entry in lot and lof
 \let\l@table\l@figure
 
 %%
@@ -1644,7 +1647,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 %% Format footnote
 %% Called with text of footnote
-\newcommand\@makefntext[1]{%
+\renewcommand\@makefntext[1]{%
     \parindent 1em%
     \noindent
     \hb@xt@1.8em{\hss\@makefnmark}#1}
@@ -1668,211 +1671,48 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 
 \sodef\bookspinespacing{}{.1em}{8pt}{0pt}% TODO adjust last two parameters ('inner space' and 'outer space')
 
-%\newcommand{\}{} % CHANGE: Removed this, gave error
-
-% CHANGE Function to adapt the font size of the title to fit the allotted space, 25pt size default
-% \usepackage{environ}% http://ctan.org/pkg/environ
-% \newdimen\fontdim
-% \newdimen\upperfontdim
-% \newdimen\lowerfontdim
-% \newif\ifmoreiterations
-% \fontdim25pt % CHANGE 
-
-% \newbox\trialbox
-% \newbox\linebox
-% \global\newcount\maxbad
-% \newcount\linebad
-% \newcount\currenthbadness
-
-% \NewEnviron{fitbox}[2]{% \begin{fitbox}{<width>}{<height>} stuff \end{fitbox}
-    % % Store environment body
-    % \def\stuff{%
-        % \BODY%
-    % }%
-    % % prepare badness box
-    % \def\badnessbox{%
-        % \global\maxbad=0\relax%
-        % \currenthbadness=\hbadness% save old \hbadness
-        % \hbadness=10000000\relax% make sure, TeX reports overfull boxes
-        % \message{Starting measureline recursion with width #1^^J}%
-        % \setbox\trialbox=\vbox{%
-            % \hsize#1\relax%
-            % \fontsize{\fontdim}{1.2\fontdim}%
-            % \selectfont%
-            % \stuff\par%
-            % \measurelines% start recursion
-        % }%
-% %       \noindent\usebox\trialbox\par
-        % \hbadness=\currenthbadness% restore old \hbadness
-    % }%
-    % % prepare recursion to measure line badness
-    % \def\measurelines{%
-        % \message{Iteration of measurelines^^J}%
-        % \begingroup%
-            % \setbox\linebox=\lastbox% get the last line
-            % \setbox0=\hbox to \hsize{\unhcopy\linebox}% put the last line into box0 to provoke badness calculation
-            % \linebad=\the\badness\relax% \badness now reflects the last typeset box, i.e. box0
-            % \message{Badness: \the\badness\space\the\linebad\space with max \the\maxbad\space at Fontsize: \the\fontdim\space^^J}%
-            % \ifnum\linebad>\maxbad% store the maximum badness
-                % \global\maxbad=\linebad% Uncomment this line to ignore overfull hboxes!
-            % \fi%
-            % \ifvoid% end of recursion
-                % \linebox%
-            % \else%
-                % \unskip\unpenalty\measurelines% do the recursion
-                % \ifhmode%
-                    % \newline%
-                % \fi%
-                % \noindent\box\linebox% do the output
-            % \fi%
-        % \endgroup%
-    % }%
-    % % Prepare measurement box
-    % \def\buildbox{%
-        % \badnessbox% measure badness
-        % \setbox0\vbox{% measure height
-            % \hbox{%
-                % \fontsize{\fontdim}{1.2\fontdim}%
-                % \selectfont%
-                % \minipage{#1}%
-                    % \vbox{%
-                        % \stuff\par%
-                    % }%
-                % \endminipage%
-            % }%
-        % }%
-        % \message{Measured badness: \the\maxbad\space at Fontsize: \the\fontdim\space^^J}%
-        % \dimen@\ht0
-        % \advance\dimen@\dp0
-        % \message{Measured box height: \the\dimen@\space^^J}%
-    % }%
-    % \def\shrinkheight{%
-        % \loop
-            % \fontdim.5\fontdim % Reduce font size by half
-            % \buildbox
-            % \message{Shrinking, new box height: \the\dimen@\space at Fontsize: \the\fontdim\space^^J}%
-        % \ifdim\dimen@>#2 \repeat
-        % \lowerfontdim\fontdim
-        % \upperfontdim2\fontdim
-        % \fontdim1.5\fontdim
-    % }%
-    % \def\shrinkwidth{%
-        % \loop
-            % \fontdim.5\fontdim % Reduce font size by half
-            % \buildbox
-        % \ifnum\maxbad>10000 \repeat
-        % \lowerfontdim\fontdim
-        % \upperfontdim2\fontdim
-        % \fontdim1.5\fontdim
-    % }%
-    % \def\growheight{%
-        % \loop
-            % \fontdim2\fontdim % Double font size
-            % \buildbox
-            % \message{Growing, new box height: \the\dimen@\space at Fontsize: \the\fontdim\space^^J}%
-        % \ifdim\dimen@<#2 \repeat
-        % \upperfontdim\fontdim
-        % \lowerfontdim.5\fontdim
-        % \fontdim.75\fontdim
-    % }%
-    % \buildbox
-    % % Compute upper and lower bounds
-    % \ifdim\dimen@>#2
-        % \message{Need to shrink box height: \the\dimen@\space^^J}%
-        % \shrinkheight
-    % \else
-        % \message{Need to grow box height: \the\dimen@\space to target: #2^^J}%
-        % \growheight
-    % \fi
-    % \message{Max font: \the\upperfontdim\space^^J}%
-    % \message{Min font: \the\lowerfontdim\space^^J}%
-    % % Potentially further reduce bounds for overfull box
-    % \ifnum\maxbad>10000
-        % \shrinkwidth
-    % \fi 
-    % \message{Max font adjusted: \the\upperfontdim\space^^J}%
-    % \message{Min font adjusted: \the\lowerfontdim\space^^J}%
-    % % Now try to find the optimum height and width
-    % \loop
-        % \buildbox
-        % \message{Height: \the\dimen@\space^^J}%
-        % \ifdim\dimen@>#2
-            % \moreiterationstrue
-            % \upperfontdim\fontdim
-            % \advance\fontdim\lowerfontdim
-            % \fontdim.5\fontdim
-        % \else
-            % \ifnum\maxbad>10000
-                % \moreiterationstrue
-                % \upperfontdim\fontdim
-                % \advance\fontdim\lowerfontdim
-                % \fontdim.5\fontdim
-            % \else
-                % \advance\dimen@-#2
-                % \ifdim\dimen@<10pt
-                    % \lowerfontdim\fontdim
-                    % \advance\fontdim\upperfontdim
-                    % \fontdim.5\fontdim
-                    % \dimen@\upperfontdim
-                    % \advance\dimen@-\lowerfontdim
-                    % \ifdim\dimen@<.2pt
-                        % \moreiterationsfalse
-                    % \else
-                        % \moreiterationstrue
-                    % \fi
-                % \else
-                    % \moreiterationsfalse
-                % \fi
-            % \fi
-        % \fi
-    % \ifmoreiterations \repeat
-    % \message{Selected font: \the\fontdim\space^^J}%
-    % \fontarial{\fontdim}{1.2\fontdim}% CHANGE Set correct font
-    % \vbox to #2{\box0\hbox{}}% Typeset content
-% }%
-
 \newcommand{\cover}[2]{%
 	\internalcoverpage{#1}%
-	\isdissertation{%
-	  \eject \pdfpagewidth 198mm \pdfpageheight 250mm% Set paper size to 198mm x 250mm
-	  \newpage%
-	  \internalbookspine
-	  \internallastpage{#2}%
-	}{%
-	  \newpage
-	}%
+    \isdissertation{%
+        \eject \pagewidth 198mm \pageheight 250mm% Set paper size to 198mm x 250mm
+        \newpage%
+        \internalbookspine
+        \internallastpage{#2}%
+    }{%
+        \newpage
+    }%
 }
 
 \newcommand{\internalcoverpage}[1]{%
 	\begingroup%
 	\vphantom{A}% problems with completely empty pages ...
 	\isdissertation{%
-		\isfinal{%
-			\begin{textblock}{176}(0,0)%
-		}{%
-			\begin{textblock}{176}(21,28.5)%
-		}
+        \isfinal{%
+    			\begin{textblock}{176}(0,0)%
+        }{%
+    			\begin{textblock}{176}(21,28.5)%
+        }
 	}{%
-		\begin{textblock}{176}(0,0)%
+        \begin{textblock}{176}(0,0)%
 	}
 	\begin{tikzpicture}[inner sep=0pt]%
 	% background image in rubin/purple using the laurel branch for dissertation and licentiate. None for the proposals.
 	\ifthenelse{\equal{\@publicationtype}{dissertation}}{% if dissertation ...
-		\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-rubin}};%
-	}{%
-		\ifthenelse{\equal{\@publicationtype}{licentiate}}{% if licentiate ...
-			\node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-grafit}};%
-		}{%
-		% no background image for 'thesisproposal' or 'researchproposal'
-		}% end of if licentiate
+        \node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-rubin}};%
+    }{%
+        \ifthenelse{\equal{\@publicationtype}{licentiate}}{% if licentiate ...
+            \node[anchor=south west](backgroundimage) at (0mm,0mm) {\includegraphics[width=176mm,height=240mm,keepaspectratio]{logos/laurelbranch-grafit}};%
+        }{%
+		  % no background image for 'thesisproposal' or 'researchproposal'
+        }% end of if licentiate
 	}% end of if dissertation
 	\end{tikzpicture}%
 	\end{textblock}%
 
 	\isdissertation{%
-		  \isfinal{
+		  \isfinal{%
 		    \begin{textblock}{138}(18,21) % Doctoral / licentiate dissertation
-		  }{
+		  }{%
 			\begin{textblock}{138}(39,49.5) % Doctoral / licentiate dissertation
 		  }
 	}{%
@@ -1884,7 +1724,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\par%
 	%
 	% user content comes here
-	\IfSubStr{Unset}{#1}{
+	\IfSubStr{Unset}{#1}{%
           \isdissertation{\vspace*{8cm}}{\vspace*{12cm}} % Show empty space if image not supplied
 	}{%
 		  \IfSubStr{#1}{includegraphics}% Check if the user supplied an includegraphics command
@@ -1896,43 +1736,39 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	\vspace*{5mm}\vfil%
 	%
 	\begin{minipage}[t]{\linewidth}%
-		\RaggedRight%
-		\color{white}%
-		\begingroup\fontgeorgia{13.5}{13.5}%
-		\MakeUppercase{\coverpagesubjectspacing{\@publicationtypelong}}
-		\par\endgroup%
-		\vspace*{4mm}%
-		\begingroup\fontarial{25}{25}
-		%\begin{fitbox}{\linewidth}{3cm} % CHANGE Include the new function here to constrain the title
-		  \flushleft\MakeUppercase{\coverpagetitlespacing{\@title}}% CHANGE Make sure to disable hyphenation
-		%\end{fitbox}%
-		\par\endgroup
-
-		\vspace*{2mm}%
-
-		% CHANGE Check if subtitle is defined in metadata.tex 
-		% If defined, show it with the same command as the title
-		% Else, just skip with the same amount of space. This gives the author and subject a fixed position
-		\ifthenelse{\equal{\@subtitleUC}{~}}{%
-			\vspace*{5mm}%
-		}{%
-			\begingroup\fontarial{14}{14}%
-			%\begin{fitbox}{\linewidth}{5mm} % CHANGE Include the new function here to constrain the subtitle
-			\@subtitle
-			%\end{fitbox}%
-			\par\endgroup%
-		}%
-			
-		\vspace*{4mm}%
-
-		\begingroup\fontarial{14.5}{14.5}\color{oxid}\MakeUppercase{\@author}\par\endgroup%
-
-		\vspace*{1mm}%
-
-		\begingroup\fontgeorgia{12}{12}\textit{\@subject}\par\endgroup%
-	\end{minipage}%
-	\end{textblock}%
-	\endgroup%
+        \RaggedRight%
+        \color{white}%
+    	\begingroup\fontgeorgia{13.5}{13.5}%
+    	\MakeUppercase{\coverpagesubjectspacing{\@publicationtypelong}}
+    	\par\endgroup%
+    	\vspace*{4mm}%
+    	\begingroup\fontarial{25}{25}
+        \flushleft\MakeUppercase{\coverpagetitlespacing{\@title}}% CHANGE Make sure to disable hyphenation
+        \par\endgroup
+    
+    		\vspace*{2mm}%
+    
+    	% CHANGE Check if subtitle is defined in metadata.tex 
+    	% If defined, show it with the same command as the title
+    	% Else, just skip with the same amount of space. This gives the author and subject a fixed position
+    	\ifthenelse{\equal{\@subtitleUC}{~}}{%
+            \vspace*{5mm}%
+        }{%
+            \begingroup\fontarial{14}{14}%
+            \@subtitle
+            \par\endgroup%
+    		}%
+    
+    		\vspace*{4mm}%
+    
+    		\begingroup\fontarial{14.5}{14.5}\color{oxid}\MakeUppercase{\@author}\par\endgroup%
+      
+    		\vspace*{1mm}%
+    
+        \begingroup\fontgeorgia{12}{12}\textit{\@subject}\par\endgroup%
+    \end{minipage}%
+    \end{textblock}%
+    \endgroup%
 }
 
 \newcommand{\internalbookspine}{%
@@ -1984,7 +1820,7 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 			\node[minimum width=35.05mm,minimum height=41.25mm](photobg){%
 			};% end of \node(photobg)
 		}
-    		\IfSubStr{Unset}{#1}{}{
+    		\IfSubStr{Unset}{#1}{}{%
 		  	\node[left=0mm of photobg.south west,anchor=south west](photo){%
 		      		\isdissertation{%
 					\IfSubStr{includegraphics}{#1}%
@@ -2015,9 +1851,9 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 		\node[below=5mm of photobg.south west,anchor=north west,text width=\abstractSize,text justified](abstract){%
 			\begingroup
 			\isdissertation{%
-				    \fontarial{11}{12}%
+				    \fontgeorgia{9}{9.5}%
 			}{%
-				    \fontarial{13}{14.5}%
+				    \fontgeorgia{13}{14.5}%
 			}
 			
 			% user content comes here
@@ -2041,19 +1877,24 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 					\fontarial{9}{11}%
 				}
 				\MakeUppercase{In collaboration with}\par\endgroup%
-			};% end of \node(collaborationlabel)
-			\node[below=1cm of collaborationlabel](collaborationlogo){%
-                  \includegraphics[width=27.5mm,height=27.5mm,keepaspectratio]{\@partnercompanylogoback}
+		  };% end of \node(collaborationlabel)
+		  \node[below=5mm of collaborationlabel](collaborationlogo){%
+         \ifthenelse{\equal{\@partnercompanylogowhite}{}}{}{\includegraphics[width=27.5mm,height=27.5mm,keepaspectratio]{\@partnercompanylogowhite}}%
+         \ifthenelse{\equal{\@otherpartnercompanylogowhite}{}}{}{% only if other collaboration partner is defined ...
+           \hspace*{13.75mm}%
+            \includegraphics[width=27.5mm,height=27.5mm,keepaspectratio]{\@otherpartnercompanylogowhite}%
+         }
 			};% end of \node(collaborationlogo)
 		}{}% end of "only if collaboration partner is defined ..."
-
 
 		% Only include ISBN and dissertation number for doctorate and licentiate
 		\isdissertation{%
 		  % ISBN and Dissertation Number
 		  \node[text width=88mm,align=flush center,below=169mm of photo.north west,anchor=north west](number) {%
 		  \begingroup\fontarial{8.5}{11}%
-		  ISBN \@isbn\\%
+		  ISBN \@isbnprint~(Print)\\%
+            ISBN \@isbnonline~(PDF)\\%
+            \medskip%
 		  Dissertation Series, No.~\@seriesnumber~(\@date)%
 		  \par\endgroup%
 		  };% end of \node(number)
@@ -2076,41 +1917,42 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 %% Titlepage
 %% 
 \renewcommand{\maketitle}{%
-        \isdraft{}{
-	\pagestyle{empty}
-	\setcounter{page}{0}
+  \isdraft{}{%
+    \pagestyle{empty}
+    \setcounter{page}{0}
 
-	\isdissertation{%
-		\cleardoublepage%
-		\begingroup%
-		\centering%
-		\vspace*{5.6cm}% value taken from Word template
-		\begingroup%
+    \isdissertation{%
+        %\iscover{\cleardoublepage}{}%
+        \cleardoublepage
+        \begingroup%
+        \centering%
+        \vspace*{5.6cm}% value taken from Word template
+        \begingroup%
         \isdissertation{%
             \fontarial{9.5}{12}%
-        }{
+        }{%
             \fontarial{12}{14.5}%
         }
-		
-		\textls[125]{% increase letter spacing by 125/1000em
-			\newdimen\origiwspc%
-		    \origiwspc=\fontdimen2\font% original inter word space
-			\fontdimen2\font=0.5em% inter word space
-			\@titleUC%
-			\fontdimen2\font=\origiwspc% (original) inter word space
-			\par%
-		}% textls
-		\endgroup%
-		\fontarial{9.5}{10.5}
+    		
+        \textls[125]{% increase letter spacing by 125/1000em
+            \newdimen\origiwspc%
+            \origiwspc=\fontdimen2\font% original inter word space
+            \fontdimen2\font=0.5em% inter word space
+            \@titleUC%
+            \fontdimen2\font=\origiwspc% (original) inter word space
+            \par%
+        }% textls
+        \endgroup%
+        \fontarial{9.5}{10.5}
         \isdissertation{%
             \fontarial{9.5}{10.5}%
-        }{
+        }{%
             \fontarial{10.5}{12}%
-        }\@subtitle%
-		\par%
-		\endgroup
-	}{%
-	}
+        }
+        \@subtitle%
+        \par%
+        \endgroup
+	}{}
 
 	\isdissertation{\cleardoublepage}{\clearpage}
 
@@ -2137,44 +1979,51 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 	{\isdissertation{\fontarial{9.5}{10}}{\fontarial{11.5}{13}}\@authorUC\par}%
 	{\isdissertation{\fontgeorgia{9.5}{9}}{\fontgeorgia{10}{11}}\textit{\@subject}\par}%
 	\isdissertation{\vspace*{5cm plus 1cm minus 1cm}}{\vspace*{8cm plus 1cm minus 1cm}}
-        \isdissertation{
-	   \includegraphics[width=3.33cm,height=3.39cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
-        }{%
-          \includegraphics[width=4.5cm,height=4.5cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
-        }\par%
+    \isdissertation{%
+        \includegraphics[width=3.33cm,height=3.39cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
+    }{%
+        \includegraphics[width=4.5cm,height=4.5cm,keepaspectratio]{logos/HiSCoatOfArms-grafit-median-\languagename}
+    }\par%
 	\endgroup%
 
 	\clearpage%
 	\vspace*{\fill}%
 	\iscollaboration{% Include Company logo if supplied
-		{\centering
-         \includegraphics[width=3.4cm,height=3.4cm,keepaspectratio]{\@partnercompanylogofront}
-         \par}% 
+            {\centering
+            \vspace*{3cm plus 1cm minus 1cm}%
+            \includegraphics[height=4.25cm,width=4.25cm,keepaspectratio]{\@partnercompanylogo}%
+            % optionally, insert other partner company logo
+            \ifthenelse{\equal{\@otherpartnercompanylogo}{}}{}{\hspace*{1.7cm}\includegraphics[height=3.4cm,width=4.25cm,keepaspectratio]{\@otherpartnercompanylogo}}%
+            \par}% 
 	}{%
-		{\centering\par }
+            {\centering\par}
 	}%
 	\vspace*{\fill}\par%
 	\begingroup%
 	{\centering%
 		\isdissertation{\fontgeorgia{12}{14}}{\fontgeorgia{14}{16}}%
 		\@author, \@date%
-		\bigskip\par%
-		%{\fontgeorgia{9.5}{12}\@publicationtypelong\smallskip\par}%
+        \smallskip\par%
+		{\fontgeorgia{9.5}{10}\@publicationtypelong}%
         \isdissertation{\fontgeorgia{9.5}{10}}{\fontgeorgia{10}{12.5}}
+        \bigskip\par%
 		{\textit{Title:} \@title\par}%
-		{\ifthenelse{\equal{\@subtitle}{}}{}{\@subtitle\par}}%
-		\medskip%
+		{\ifthenelse{\equal{\@subtitle}{}}{}{\textls[25]{\fontgeorgia{8}{9}\@subtitle}\par}}%
+        \isdissertation{\fontgeorgia{9.5}{10}}{\fontgeorgia{10}{12.5}}
+		\par%\medskip\par%
 		University of Skövde \@date, Sweden\\%
 		\href{https://www.his.se/}{www.his.se}
 		\isdissertation{%
-			\bigskip\par%
+			\medskip\par%
 			\textit{Printer:} \@printshop
 			\medskip\par%
-			ISBN \@isbn\par%
+			{\setlength{\parskip}{0pt}%
+                ISBN \@isbnprint~(Print)\par%
+                ISBN \@isbnonline~(PDF)\par}%
 			Dissertation Series, No. \@seriesnumber~(\@date)%
 		}{%
 		}
-	\par}%
+	\medskip\par}%
 	\endgroup%
 	\@titlepagefalse
  }
@@ -2215,55 +2064,42 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     }
 }
 
-\newcommand{\selectedfont}{%
-    \isdissertation{%
-        \fontarial{9}{11}
-    }{%
-        \fontarial{11}{12.5} 
-    }
-}
-
 \usepackage[titles]{tocloft}
     \renewcommand{\cftdotsep}{1}
-    \renewcommand{\cftpartfont}{\selectedfont}
-    \renewcommand{\cftpartpagefont}{\selectedfont}
+    \setlength\cftparskip{1pt}
+    \cftsetrmarg{0em}
+    
+    \renewcommand{\cftpartfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cftpartpagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
     \renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}}
     
+    \renewcommand{\cftchapfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cftchappagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
     \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-    \renewcommand{\cftchapfont}{\selectedfont}
-    \renewcommand{\cftchappagefont}{\selectedfont}
     
-    \renewcommand{\cftsecfont}{\selectedfont}
-    \renewcommand{\cftsecpagefont}{\selectedfont}
+    \renewcommand{\cftsecfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cftsecpagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
     
-    \renewcommand{\cftsubsecfont}{\selectedfont}
-    \renewcommand{\cftsubsecpagefont}{\selectedfont}
+    \renewcommand{\cftsubsecfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cftsubsecpagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
     
-    \renewcommand{\cftfigfont}{\selectedfont}
-    \renewcommand{\cftfigpagefont}{\selectedfont}
-    %\renewcommand{\cftsubfigfont}{\selectedfont}
-    %\renewcommand{\cftsubfigpagefont}{\selectedfont}
+    \renewcommand{\cftfigfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cftfigpagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \cftsetindents{figure}{1em}{2.3em} % Figure indent
     
-    \renewcommand{\cfttabfont}{\selectedfont}
-    \renewcommand{\cfttabpagefont}{\selectedfont}
-    %\renewcommand{\cfttabindent}{\cftchapindent}
-    %\renewcommand{\cftsubtabfont}{\selectedfont}
-    %\renewcommand{\cftsubtabpagefont}{\selectedfont}
-    %\renewcommand{\cftsetpnumwidth}{0.5em}
+    \renewcommand{\cfttabfont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \renewcommand{\cfttabpagefont}{\isdissertation{\fontarial{9}{11}}{\fontarial{11}{12.5}}}
+    \cftsetindents{table}{1em}{2.3em} % Table indent
 
 % Front matter specification
 \isdraft{%
     \renewenvironment{frontmatter}{%
-        \isdissertation{%
-            \fontgeorgia{9.5}{11}
-        }{%
-            \fontgeorgia{11}{12.5}
-        }%
-    }{
+        \setfontsizeandtype
+    }{%
         \pagestyle{headings}
-        	\pagenumbering{arabic}% Switch to Arabic page numbers
+        \pagenumbering{arabic}% Switch to Arabic page numbers
         \setcounter{page}{1}% Start page numbers from '1'
-    	  \mainmatter
+        \mainmatter
     }
 }{%
     \renewenvironment{frontmatter}{%
@@ -2285,31 +2121,32 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
         \clearpage
         \markboth{}{}% no page header
         %\hypersetup{pageanchor=true}
-    	\pagenumbering{Roman}% Switch to Roman page numbers
+        \pagenumbering{Roman}% Switch to Roman page numbers
         \setcounter{page}{1}% Start page numbers from 'I' (Roman 1)
         \pagestyle{footeronly}
         \justifying
         
-        
         % Set default font
-        \isdissertation{%
-            \fontgeorgia{9.5}{11}
-        }{%
-            \fontgeorgia{11}{12.5}
-        }%
+        %\setfontsizeandtype
+        %\setlength{\parskip}{0pt}
+        \renewcommand\baselinestretch{}
+        \setlength\parskip{4.5\p@ \@plus0\p@}
+        \parindent=\z@
+        %\setlength{\parindent}{0pt}
+        %\noindent % CHANGE Remove indentation for abstract and summary
     }{%
         \tableofcontents
         \listoffigures
         \listoftables
         
-        \@ifpackageloaded{glossaries-extra}{
+        \@ifpackageloaded{glossaries-extra}{%
           \isdissertation{\cleardoublepage}{\clearpage}
           \pdfbookmark[section]{Abbreviations}{abbreviations} % CHANGE To include an entry in the bookmarks section of the PDF
           \chapter*{Abbreviations}
           \renewcommand{\glossarysection}[2][]{} % Remove the added section in printglossary
+          \setlength{\glsdescwidth}{0.7\textwidth}
           \printglossary
-        }{
-        }
+        }{}
         
         \isdissertation{\cleardoublepage}{\clearpage}
         \pagestyle{headings}
@@ -2319,9 +2156,13 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
     }
 }
 
-\isdraft{
-    \renewenvironment{backmatter}{}{}
-}{
+\isdraft{%
+    \renewenvironment{backmatter}{%
+        \@mainmatterfalse
+    }{%
+    
+    }
+}{%
     \renewenvironment{backmatter}{%
         \@mainmatterfalse
         \sloppy
@@ -2330,19 +2171,18 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
         \isdissertation{\dissertationlist}{}
         \fussy
         \iscover{%
-    		\isdissertation{\cleardoublepage}{\clearpage}
+            \isdissertation{\cleardoublepage}{\clearpage}
             \newpagecolor{specialpagebackgroundcover}%
-    		\pagestyle{empty}
-    		\ifthenelse{\boolean{@isfinal}}{}{
-    			\newgeometry{showcrop=false}
-    		}
-    		
-    		\isdissertation{%
-    			\eject \pdfpagewidth 198mm \pdfpageheight 250mm% Set paper size to 198mm x 250mm
-    			\newpage
-    			\internalbookspine
-    		}{%
-    		}
+            \pagestyle{empty}
+            \isfinal{}{%
+                \newgeometry{showcrop=false}
+            }
+        		
+            \isdissertation{%
+        			\eject \pagewidth 198mm \pageheight 250mm% Set paper size to 198mm x 250mm
+        			\newpage
+        			\internalbookspine
+            }{}
             \internallastpage{\@coverphoto}%
         }{}
     }
@@ -2369,22 +2209,21 @@ luatexbase.add_to_callback("post_linebreak_filter",orangebox,"orangebox")
 \pagenumbering{arabic}
 
 % Set default font to Georgia 9.5pt if dissertation (not A4 format), else 11pt
-\isdissertation{%
-  \fontgeorgia{9.5}{11}
-}{%
-  \fontgeorgia{11}{12.5}
-}
+\setfontsizeandtype
 
 \usepackage[shortlabels]{enumitem} % Indentation of lists
-\setlist[enumerate,1]{leftmargin=0.75cm}
-\setlist[itemize,1]{leftmargin=0.75cm}
+\setlist[enumerate,1]{leftmargin=1cm, align=right}
+%\setlist[enumerate]{align=left, itemsep=1pt, parsep=3pt, topsep=1pt, itemindent=!, leftmargin=*, labelindent=0.5cm}
+%\setlist[itemize]{align=left, itemsep=1pt, parsep=3pt, topsep=1pt, itemindent=!, leftmargin=*, labelindent=0.5cm}
 
-\usepackage{hyperref}
+%\usepackage{hyperref}
+\urlstyle{same}
 \input{metadata}
 
 \newboolean{@iscollaboration}
-\ifthenelse{\equal{\@partnercompany}{\missingparam{partnercompany}} \OR \equal{\@partnercompanylogofront}{\missingparam{partnercompanylogofront}} \OR \equal{\@partnercompanylogoback}{\missingparam{partnercompanylogoback}}}
-{\setboolean{@iscollaboration}{false}}{\setboolean{@iscollaboration}{true}}
+\ifthenelse{\equal{\@partnercompany}{\missingparam{partnercompany}}}
+{\setboolean{@iscollaboration}{false}}
+{\setboolean{@iscollaboration}{true}}
 \newcommand{\iscollaboration}[2]{\ifthenelse{\boolean{@iscollaboration}}{#1}{#2}}
 
 %%

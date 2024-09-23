@@ -7,7 +7,7 @@ This repo contains LaTeX templates for the PhD education at the University of Sk
 - Research Proposal
 
 ## Requirements
-LuaLaTeX as the engine, change that in Overleaf. To compile locally you can use [TexLive](https://tug.org/texlive/). The files are updated to work in TexLive 2022.
+LuaLaTeX as the engine, change that in Overleaf. To compile locally you can use [TexLive](https://tug.org/texlive/). The files are updated to work in TexLive 2024.
 
 ## Installation
 Upload the package to Overleaf or use the Makefile to build locally.
@@ -63,8 +63,10 @@ An alternate way of supplying the partnercompanylogo is to specify the first and
 %% Define partner company name and logo.
 %% To be used if you are performing the work in collaboration with a company.
 \partnercompany{Company AB}
-\partnercompanylogofront{img/companylogo-front.png}
-\partnercompanylogoback{img/companylogo-back.png}
+\partnercompanylogo[img/companylogo-back.png]{img/companylogo-front.png}
+
+\otherpartnercompany{Other Company AB}
+\otherpartnercompanylogo[img/companylogo-back.png]{img/companylogo-front.png}
 ```
 This can be useful as the legibility of the second logo, printed on the back, could be hard to read with the colored background of the cover. A black logo on the imprint page, and a white logo on the back cover, could improve legibility.
 
@@ -73,6 +75,12 @@ Sets the front cover image, which is optional, and the back cover photo which is
 %% The path to an image on the front cover, and an image of you on the back cover.
 \coverimage{template/Manuscript/foto.jpg}
 \coverphoto{template/Manuscript/face.jpg}
+```
+
+Another addition to the template is the issuing of two ISBN numbers, one for print and one for the online version in DiVA.
+```latex
+\isbnprint{978-91-987907-X-X} % Publication ISBN
+\isbnonline{978-91-987907-X-X} % PDF ISBN
 ```
 
 ## Difference between thesis and proposal
